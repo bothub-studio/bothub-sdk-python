@@ -38,11 +38,11 @@ class StorageClient(Client):
         super(StorageClient, self).__init__(project_id, api_key, base_url, transport)
 
     @staticmethod
-    def init_client(context):
+    def init_client(context, transport=None):
         project_id = context.get('project_id')
         api_key = context.get('api_key', '')
         storage_endpoint = context.get('storage', {}).get('endpoint')
-        return StorageClient(project_id, api_key, storage_endpoint)
+        return StorageClient(project_id, api_key, storage_endpoint, transport=transport)
 
     def set_project_data(self, data):
         self.transport.put(
