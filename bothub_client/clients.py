@@ -11,7 +11,7 @@ class Client(object):
         self.project_id = project_id
         self.base_url = base_url
         self.api_key = api_key
-        self.transport = transport or HttpTransport()
+        self.transport = transport or HttpTransport(base_url)
 
 
 class ChannelClient(Client):

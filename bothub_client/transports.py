@@ -6,14 +6,15 @@ import requests
 
 
 class HttpTransport(object):
-    def __init__(self):
+    def __init__(self, base_url=''):
         self.session = requests.Session()
+        self.base_url = base_url
 
-    def get(self, url, data):
-        return self.session.get(url).json()
+    def get(self, path, data=None):
+        return self.session.get(self.base_url+path).json()
 
-    def post(self, url, data):
-        return self.session.post(url, json=data)
+    def post(self, path, data=None):
+        return self.session.post(self.base_url+path, json=data)
 
-    def put(self, url, data):
-        return self.session.put(url, json=data)
+    def put(self, path, data=None):
+        return self.session.put(self.base_url+path, json=data)
