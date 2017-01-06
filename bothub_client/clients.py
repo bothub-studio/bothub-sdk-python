@@ -47,24 +47,24 @@ class StorageClient(Client):
     def set_project_data(self, data):
         self.transport.put(
             '/projects/{}'.format(self.project_id),
-            data,
+            {'data': data},
         )
 
     def get_project_data(self):
         return self.transport.get(
             '/projects/{}'.format(self.project_id),
-        )
+        ).get('data')
 
     def set_user_data(self, channel, user_id, data):
         self.transport.put(
             '/projects/{}/channels/{}/users/{}'.format(self.project_id, channel, user_id),
-            data,
+            {'data': data},
         )
 
     def get_user_data(self, channel, user_id):
         return self.transport.get(
             '/projects/{}/channels/{}/users/{}'.format(self.project_id, channel, user_id)
-        )
+        ).get('data')
 
 
 class LogClient(object):
