@@ -34,15 +34,18 @@ class ChannelClient(Client):
 
 
 class StorageClient(Client):
-    def __init__(self, project_id, api_key, base_url, transport=None):
+    def __init__(self, project_id, api_key, base_url, transport=None, user=None):
         super(StorageClient, self).__init__(project_id, api_key, base_url, transport)
+        self.current_user = user
 
     @staticmethod
     def init_client(context, transport=None):
         project_id = context.get('project_id')
         api_key = context.get('api_key', '')
         storage_endpoint = context.get('storage', {}).get('endpoint')
-        return StorageClient(project_id, api_key, storage_endpoint, transport=transport)
+        channel = context['event']['channel']
+        user_id = context['event']['sender']['id']
+        return StorageClient(project_id, api_key, storage_endpoint, transport=transport, user=(channel, user_id))
 
     def set_project_data(self, data):
         self.transport.put(
@@ -65,6 +68,14 @@ class StorageClient(Client):
         return self.transport.get(
             '/projects/{}/channels/{}/users/{}'.format(self.project_id, channel, user_id)
         ).get('data')
+
+    def set_current_user_data(self, data):
+        channel, user_id = self.current_user
+        self.set_user_data(channel, user_id, data)
+
+    def get_current_user_data(self):
+        channel, user_id = self.current_user
+        self.get_user_data(channel, user_id)
 
 
 class LogClient(object):
