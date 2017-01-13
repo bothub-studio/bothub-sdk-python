@@ -74,7 +74,7 @@ class StorageClient(Client):
 
     def get_current_user_data(self):
         channel, user_id = self.current_user
-        self.get_user_data(channel, user_id)
+        return self.get_user_data(channel, user_id)
 
 
 class LogClient(object):
