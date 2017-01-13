@@ -55,7 +55,7 @@ class StorageClient(Client):
     def get_project_data(self):
         return self.transport.get(
             '/projects/{}'.format(self.project_id),
-        ).get('data')
+        ).get('data') or {}
 
     def set_user_data(self, channel, user_id, data):
         self.transport.put(
@@ -66,7 +66,7 @@ class StorageClient(Client):
     def get_user_data(self, channel, user_id):
         return self.transport.get(
             '/projects/{}/channels/{}/users/{}'.format(self.project_id, channel, user_id)
-        ).get('data')
+        ).get('data') or {}
 
     def set_current_user_data(self, data):
         channel, user_id = self.current_user
@@ -74,7 +74,7 @@ class StorageClient(Client):
 
     def get_current_user_data(self):
         channel, user_id = self.current_user
-        self.get_user_data(channel, user_id)
+        return self.get_user_data(channel, user_id)
 
 
 class LogClient(object):
