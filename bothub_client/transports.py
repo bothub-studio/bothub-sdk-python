@@ -10,7 +10,7 @@ class HttpTransport(object):
         self.session = requests.Session()
         self.base_url = base_url
 
-    def get(self, path, data=None):
+    def get(self, path):
         return self.session.get(self.base_url+path).json()
 
     def post(self, path, data=None):
