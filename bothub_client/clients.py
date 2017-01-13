@@ -39,13 +39,12 @@ class StorageClient(Client):
         self.current_user = user
 
     @staticmethod
-    def init_client(context, transport=None):
+    def init_client(context, event=None, transport=None):
         project_id = context.get('project_id')
         api_key = context.get('api_key', '')
         storage_endpoint = context.get('storage', {}).get('endpoint')
-        channel = context['event']['channel']
-        user_id = context['event']['sender']['id']
-        return StorageClient(project_id, api_key, storage_endpoint, transport=transport, user=(channel, user_id))
+        user = None if not event else (context['event']['channel'], context['event']['sender']['id'])
+        return StorageClient(project_id, api_key, storage_endpoint, transport=transport, user=user)
 
     def set_project_data(self, data):
         self.transport.put(
