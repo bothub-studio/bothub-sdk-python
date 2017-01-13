@@ -43,7 +43,7 @@ class StorageClient(Client):
         project_id = context.get('project_id')
         api_key = context.get('api_key', '')
         storage_endpoint = context.get('storage', {}).get('endpoint')
-        user = None if not event else (context['event']['channel'], context['event']['sender']['id'])
+        user = None if not event else (event['channel'], event['sender']['id'])
         return StorageClient(project_id, api_key, storage_endpoint, transport=transport, user=user)
 
     def set_project_data(self, data):
