@@ -17,7 +17,7 @@ def fixture_client(transport=None):
         }
     }
 
-    client = StorageClient.init_client(context, transport)
+    client = StorageClient.init_client(context, transport=transport)
     return client
 
 
@@ -39,4 +39,3 @@ def test_set_project_data():
     client.set_project_data({
         'score': 11
     })
-
