@@ -6,6 +6,18 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 from bothub_client.transports import HttpTransport
 
 
+def handle_message(event, context, bot_class):
+    channel = ChannelClient.init_client(context)
+    storage = StorageClient.init_client(context, event=event)
+
+    context['channel'] = channel
+    context['storage'] = storage
+
+    bot = bot_class(channel_client=channel, storage_client=storage, event=event)
+    result = bot.handle_message(event, context)
+    return {'result': result, 'proxy': channel.cmd_buff}
+
+
 class Client(object):
     def __init__(self, project_id, api_key, base_url, transport=None):
         self.project_id = project_id
