@@ -8,14 +8,22 @@ except ImportError:
     use_setuptools()
     from setuptools import setup
 
+from os import path
+
+HERE = path.abspath(path.dirname(__file__))
+
+with open(path.join(HERE, 'README.rst'), encoding='utf-8') as f:
+    LONG_DESCRIPTION = f.read()
 
 setup(
-    name='bothub-client',
-    version='0.0.1',
-    description=u'',
+    name='bothub',
+    version='0.1.0',
+    description=u'A package to build serverless chatbot on bothub.studio',
+    long_description=LONG_DESCRIPTION,
     author='Jeongsoo Park',
     author_email='toracle@gmail.com',
-    url='https://github.com/toracle/bothub-client',
+    url='https://github.com/bothub-studio/bothub',
+    license="AGPL v3",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
@@ -28,18 +36,17 @@ setup(
         'pytest',
         'requests-mock',
     ],
-    dependency_links=[
-    ],
-    entry_points={
-        'console_scripts': [
-        ]
-    },
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
+        'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
+        'Topic :: Communications :: Chat',
+        'Topic :: Software Development :: Libraries :: Application Frameworks',
         'Topic :: Utilities'
     ],
+    keywords='bothub serverless chatbot framework',
 )
