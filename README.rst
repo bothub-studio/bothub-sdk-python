@@ -1,8 +1,8 @@
 =========================================
-Bothub: Chatbot Framework for easy deploy
+BotHub: Chatbot Framework for easy deploy
 =========================================
 
-This package provide components to works with `Bothub.studio`_, which is a chatbot hosting service.
+This package provide components to works with `BotHub.Studio`_, which is a chatbot hosting service.
 
 With `bothub-cli`_, you can deploy a new chatbot with just four lines of commands.
 
@@ -57,4 +57,4 @@ License
 This package is licensed under AGPLv3 for non-commercial personal use. If you want to use this package for commercial use, please contact to ``bothub@bothub.studio``.
 	   
 .. _Bothub.studio: https://bothub.studio
-.. _bothub-cli: https://github.com/bothub-studio/bothub-cli
+.. _bothub-cli: https://pypi.python.org/pypi/bothub-cli
