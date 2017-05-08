@@ -45,6 +45,19 @@ class ChannelClient(Client):
         self.cmd_buff.append({'chat_id': chat_id, 'message': message, 'channel': channel})
 
 
+class ConsoleChannelClient(Client):
+    def __init__(self):
+        super(ConsoleChannelClient, self).__init__(None, None, None)
+
+    def respond_message(self, message):
+        print(message)
+
+    def send_message(self, chat_id, message, channel=None):
+        _channel = '[{}] '.format(chat_id) if channel else ''
+        _channel = '[{}:{}] '.format(channel, chat_id) if channel is not None else _channel
+        print('{}{}'.format(_channel, message))
+
+
 class StorageClient(Client):
     def __init__(self, project_id, api_key, base_url, transport=None, user=None):
         super(StorageClient, self).__init__(project_id, api_key, base_url, transport)
@@ -79,6 +92,34 @@ class StorageClient(Client):
         return self.transport.get(
             '/projects/{}/channels/{}/users/{}'.format(self.project_id, channel, user_id)
         ).get('data') or {}
+
+    def set_current_user_data(self, data):
+        channel, user_id = self.current_user
+        self.set_user_data(channel, user_id, data)
+
+    def get_current_user_data(self):
+        channel, user_id = self.current_user
+        return self.get_user_data(channel, user_id)
+
+
+class LocMemStorageClient(Client):
+    def __init__(self, user=None):
+        super(LocMemStorageClient, self).__init__(None, None, None)
+        self.current_user = user
+        self.project_storage = {}
+        self.user_storage = {}
+
+    def set_project_data(self, data):
+        self.project_storage.update(**data)
+
+    def get_project_data(self):
+        return self.project_storage
+
+    def set_user_data(self, channel, user_id, data):
+        self.user_storage.update(**data)
+
+    def get_user_data(self, channel, user_id):
+        return self.user_storage
 
     def set_current_user_data(self, data):
         channel, user_id = self.current_user
