@@ -2,6 +2,8 @@
 
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 
+import requests_mock
+
 from bothub_client.bot import BaseBot
 from bothub_client.clients import handle_message
 
@@ -22,8 +24,20 @@ def test_handle_message_should_add_channel_cmd_buff():
         }
     }
 
-    context = {}
+    context = {
+        'channel': {
+            'endpoint': 'http://localhost'
+        }
+    }
 
-    result = handle_message(event, context, Bot)
-    assert result['result'] is None
-    assert result['proxy'] == [{'channel': None, 'chat_id': None, 'message': 'hello, you said: hi!'}]
+    with requests_mock.mock() as m:
+        m.post('http://localhost/')
+        response = handle_message(event, context, Bot)
+        assert response['response'] is None
+        assert m.called
+        assert m.request_history[0].json() == {
+            'channel': 'mychannel',
+            'receiver': 'abcd1234',
+            'message': 'hello, you said: hi!',
+            'event': event
+        }

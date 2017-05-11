@@ -8,6 +8,7 @@ except ImportError:
     use_setuptools()
     from setuptools import setup
 
+from codecs import open
 from os import path
 
 HERE = path.abspath(path.dirname(__file__))
@@ -28,6 +29,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'requests',
+        'zmq',
     ],
     setup_requires=[
         'pytest-runner',

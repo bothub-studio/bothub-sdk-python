@@ -1,3 +1,9 @@
+0.1.2
+-----
+
+* add a ``ZmqChannelClient`` class
+* pass event object to channel client
+
 0.1.1
 -----
 
