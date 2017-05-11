@@ -8,6 +8,7 @@ except ImportError:
     use_setuptools()
     from setuptools import setup
 
+from codecs import open
 from os import path
 
 HERE = path.abspath(path.dirname(__file__))
@@ -17,7 +18,7 @@ with open(path.join(HERE, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='bothub',
-    version='0.1.1',
+    version='0.1.2',
     description=u'Build serverless chatbot on BotHub.Studio',
     long_description=LONG_DESCRIPTION,
     author='Jeongsoo Park',
@@ -28,6 +29,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'requests',
+        'zmq',
     ],
     setup_requires=[
         'pytest-runner',

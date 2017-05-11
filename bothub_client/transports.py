@@ -3,6 +3,7 @@
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 
 import requests
+import zmq
 
 
 class HttpTransport(object):
@@ -11,10 +12,23 @@ class HttpTransport(object):
         self.base_url = base_url
 
     def get(self, path):
-        return self.session.get(self.base_url+path).json()
+        return self.session.get('{}{}'.format(self.base_url, path)).json()
 
     def post(self, path, data=None):
-        return self.session.post(self.base_url+path, json=data)
+        return self.session.post('{}{}'.format(self.base_url, path), json=data)
 
     def put(self, path, data=None):
-        return self.session.put(self.base_url+path, json=data)
+        return self.session.put('{}{}'.format(self.base_url, path), json=data)
+
+
+class ZmqTransport(object):
+    def __init__(self, address):
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.PUSH)
+        self.socket.connect(address)
+
+    def send_json(self, cmd, data):
+        return self.socket.send_json({'cmd': cmd, 'data': data})
+
+    def send_multipart(self, data):
+        return self.socket.send_multipart(data)

@@ -4,18 +4,32 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 
 
 from bothub_client.transports import HttpTransport
+from bothub_client.transports import ZmqTransport
+
+
+def get_channel_client(context):
+    scheme_to_channel_client = {
+        'http': ChannelClient,
+        'https': ChannelClient,
+        'tcp': ZmqChannelClient,
+    }
+
+    endpoint = context.get('channel', {}).get('endpoint', 'http:')
+    scheme = endpoint.split(':')[0]
+    client_class = scheme_to_channel_client.get(scheme, ZmqChannelClient)
+    return client_class.init_client(context)
 
 
 def handle_message(event, context, bot_class):
-    channel = ChannelClient.init_client(context)
+    channel = get_channel_client(context)
     storage = StorageClient.init_client(context, event=event)
 
     context['channel'] = channel
     context['storage'] = storage
 
     bot = bot_class(channel_client=channel, storage_client=storage, event=event)
-    result = bot.handle_message(event, context)
-    return {'result': result, 'proxy': channel.cmd_buff}
+    response = bot.handle_message(event, context)
+    return {'response': response}
 
 
 class Client(object):
@@ -28,8 +42,8 @@ class Client(object):
 
 class ChannelClient(Client):
     def __init__(self, project_id, api_key, base_url, transport=None):
+        _transport = transport or HttpTransport
         super(ChannelClient, self).__init__(project_id, api_key, base_url, transport)
-        self.cmd_buff = []
 
     @staticmethod
     def init_client(context):
@@ -38,21 +52,39 @@ class ChannelClient(Client):
         channel_endpoint = context.get('channel', {}).get('endpoint')
         return ChannelClient(project_id, api_key, channel_endpoint)
 
-    def respond_message(self, message):
-        self.cmd_buff.append({'chat_id': None, 'message': message, 'channel': None})
+    def send_message(self, chat_id, message, channel=None, event=None):
+        sender_id = event.get('sender', {}).get('id', None)
+        origin_channel = event.get('channel')
+        _chat_id = chat_id or sender_id
+        _channel = channel or origin_channel
+        self.transport.post('/messages', {'channel': _channel, 'receiver': _chat_id, 'message': message, 'event': event})
 
-    def send_message(self, chat_id, message, channel=None):
-        self.cmd_buff.append({'chat_id': chat_id, 'message': message, 'channel': channel})
+
+class ZmqChannelClient(Client):
+    def __init__(self, project_id, api_key, base_url, transport=None):
+        _transport = transport or ZmqTransport
+        super(ZmqChannelClient, self).__init__(project_id, api_key, base_url, _transport)
+
+    @staticmethod
+    def init_client(context):
+        project_id = context.get('project_id')
+        api_key = context.get('api_key', '')
+        channel_endpoint = context.get('channel', {}).get('endpoint')
+        return ZmqChannelClient(project_id, api_key, channel_endpoint)
+
+    def send_message(self, chat_id, message, channel=None, event=None):
+        sender_id = event.get('sender', {}).get('id', None)
+        origin_channel = event.get('channel')
+        _chat_id = chat_id or sender_id
+        _channel = channel or origin_channel
+        self.transport.send_json({'channel': _channel, 'receiver': _chat_id, 'message': message, 'event': event})
 
 
 class ConsoleChannelClient(Client):
     def __init__(self):
         super(ConsoleChannelClient, self).__init__(None, None, None)
 
-    def respond_message(self, message):
-        print(message)
-
-    def send_message(self, chat_id, message, channel=None):
+    def send_message(self, chat_id, message, channel=None, event=None):
         _channel = '[{}] '.format(chat_id) if channel else ''
         _channel = '[{}:{}] '.format(channel, chat_id) if channel is not None else _channel
         print('{}{}'.format(_channel, message))

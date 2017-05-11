@@ -26,7 +26,6 @@ You can build a echo chatbot simply by subclassing ``BaseBot`` class and overrid
 
    # -*- coding: utf-8 -*-
    
-   from __future__ import (absolute_import, division, print_function, unicode_literals)
    from bothub_client.bot import BaseBot
    
    class Bot(BaseBot):
