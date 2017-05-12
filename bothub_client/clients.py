@@ -25,9 +25,6 @@ def handle_message(event, context, bot_class):
     channel = get_channel_client(context)
     storage = StorageClient.init_client(context, event=event)
 
-    context['channel'] = channel
-    context['storage'] = storage
-
     bot = bot_class(channel_client=channel, storage_client=storage, event=event)
     response = bot.handle_message(event, context)
     return {'response': response}
