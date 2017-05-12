@@ -27,8 +27,8 @@ class ZmqTransport(object):
         self.socket = self.context.socket(zmq.PUSH)
         self.socket.connect(address)
 
-    def send_json(self, cmd, data):
-        return self.socket.send_json({'cmd': cmd, 'data': data})
+    def send_json(self, data):
+        return self.socket.send_json(data)
 
     def send_multipart(self, data):
         return self.socket.send_multipart(data)
