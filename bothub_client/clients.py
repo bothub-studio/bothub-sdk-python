@@ -2,6 +2,7 @@
 
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 
+import json
 
 from bothub_client.transports import HttpTransport
 from bothub_client.transports import ZmqTransport
@@ -61,8 +62,9 @@ class ChannelClient(Client):
 
 
 class ZmqChannelClient(Client):
-    def __init__(self, project_id, api_key, base_url, transport=None):
+    def __init__(self, project_id, api_key, base_url, transport=None, context=None):
         _transport = transport or ZmqTransport(base_url)
+        self.context = context
         super(ZmqChannelClient, self).__init__(project_id, api_key, base_url, _transport)
 
     @staticmethod
@@ -70,14 +72,31 @@ class ZmqChannelClient(Client):
         project_id = context.get('project_id')
         api_key = context.get('api_key', '')
         channel_endpoint = context.get('channel', {}).get('endpoint')
-        return ZmqChannelClient(project_id, api_key, channel_endpoint)
+        return ZmqChannelClient(project_id, api_key, channel_endpoint, context=context)
+
+    def get_channel_obj(self, channel_type):
+        channels = self.context['channel']['channels']
+        for c in channels:
+            if c['type'] == channel_type:
+                return c
 
     def send_message(self, chat_id, message, channel=None, event=None):
         sender_id = event.get('sender', {}).get('id', None)
         origin_channel = event.get('channel')
         _chat_id = chat_id or sender_id
-        _channel = channel or origin_channel
-        self.transport.send_json({'channel': _channel, 'receiver': _chat_id, 'message': message, 'event': event})
+        channel_type = channel or origin_channel
+        _channel = self.get_channel_obj(channel_type)
+        data = {
+            'channel': _channel,
+            'receiver': _chat_id,
+            'message': message,
+            'event': event,
+            'context': {
+                'project_id': self.project_id,
+                'api_key': self.api_key
+            }
+        }
+        self.transport.send_multipart([json.dumps(data).encode('utf8')])
 
 
 class ConsoleChannelClient(Client):
