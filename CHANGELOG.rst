@@ -1,3 +1,8 @@
+0.1.3
+-----
+
+* fix ``ZmqTransport`` send_json method signature mismatch
+
 0.1.2
 -----
 
