@@ -1,3 +1,8 @@
+0.1.4
+-----
+
+* fix ``ZmqChannelClient`` invalid default transport object
+
 0.1.3
 -----
 
