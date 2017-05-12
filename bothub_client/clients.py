@@ -62,7 +62,7 @@ class ChannelClient(Client):
 
 class ZmqChannelClient(Client):
     def __init__(self, project_id, api_key, base_url, transport=None):
-        _transport = transport or ZmqTransport
+        _transport = transport or ZmqTransport(base_url)
         super(ZmqChannelClient, self).__init__(project_id, api_key, base_url, _transport)
 
     @staticmethod
