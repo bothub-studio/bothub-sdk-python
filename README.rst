@@ -55,5 +55,5 @@ License
 
 This package is licensed under AGPLv3 for non-commercial personal use. If you want to use this package for commercial use, please contact to ``bothub@bothub.studio``.
 	   
-.. _Bothub.studio: https://bothub.studio
+.. _Bothub.studio: https://bothub.studio?utm_source=pypi&utm_medium=display&utm_campaign=bothub
 .. _bothub-cli: https://pypi.python.org/pypi/bothub-cli
