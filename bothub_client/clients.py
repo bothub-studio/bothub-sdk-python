@@ -50,12 +50,22 @@ class ChannelClient(Client):
         channel_endpoint = context.get('channel', {}).get('endpoint')
         return ChannelClient(project_id, api_key, channel_endpoint)
 
-    def send_message(self, chat_id, message, channel=None, event=None):
+    def send_message(self, chat_id, message, channel=None, event=None, extra=None):
         sender_id = event.get('sender', {}).get('id', None)
         origin_channel = event.get('channel')
         _chat_id = chat_id or sender_id
         _channel = channel or origin_channel
-        self.transport.post('/messages', {'channel': _channel, 'receiver': _chat_id, 'message': message, 'event': event})
+        self.transport.post('/messages', {
+            'channel': _channel,
+            'receiver': _chat_id,
+            'message': message,
+            'event': event,
+            'context': {
+                'project_id': self.project_id,
+                'api_key': self.api_key
+            },
+            'extra': extra
+        })
 
 
 class ZmqChannelClient(Client):
@@ -77,7 +87,7 @@ class ZmqChannelClient(Client):
             if c['type'] == channel_type:
                 return c
 
-    def send_message(self, chat_id, message, channel=None, event=None):
+    def send_message(self, chat_id, message, channel=None, event=None, extra=None):
         sender_id = event.get('sender', {}).get('id', None)
         origin_channel = event.get('channel')
         _chat_id = chat_id or sender_id
@@ -91,7 +101,8 @@ class ZmqChannelClient(Client):
             'context': {
                 'project_id': self.project_id,
                 'api_key': self.api_key
-            }
+            },
+            'extra': extra
         }
         self.transport.send_multipart([json.dumps(data).encode('utf8')])
 
