@@ -176,11 +176,3 @@ class LocMemStorageClient(Client):
     def get_current_user_data(self):
         channel, user_id = self.current_user
         return self.get_user_data(channel, user_id)
-
-
-class LogClient(object):
-    def __init__(self, project_id, api_key, base_url, transport=None):
-        self.project_id = project_id
-        self.base_url = base_url
-        self.api_key = api_key
-        self.transport = transport
