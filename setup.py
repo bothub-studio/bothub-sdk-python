@@ -18,7 +18,7 @@ with open(path.join(HERE, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='bothub',
-    version='0.1.6',
+    version='0.1.7',
     description=u'Build serverless chatbot on BotHub.Studio',
     long_description=LONG_DESCRIPTION,
     author='Jeongsoo Park',
