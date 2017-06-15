@@ -191,7 +191,15 @@ class LocMemStorageClient(Client):
 
 
 class NluClient(object):
-    def get_response(self, message):
+    ''''''
+    def ask(self, event=None, message=None, session_id=None):
+        '''Request a query to NLU service.
+
+        There are two styles to request to NLU service::
+
+        * client.ask(event=event)
+        * client.ask(message=message, session_id=session_id)
+        '''
         raise NotImplementedError()
 
 
@@ -202,19 +210,34 @@ class ApiAiNluClient(NluClient):
         self.apiai = apiai_module.ApiAI(api_key)
 
     def parse_response(self, response):
+        content = response.read().decode('utf-8')
+        json_response = json.loads(content)
         action = NluAction(
-            response.get('result').get('action'),
-            response.get('result').get('parameters'),
-            response.get('result').get('actionIncomplete')
+            json_response.get('result').get('action'),
+            json_response.get('result').get('parameters'),
+            json_response.get('result').get('actionIncomplete')
         )
-        next_message = response.get('result').get('fulfillment', {}).get('speech')
-        return NluResponse(response, next_message, action)
+        next_message = json_response.get('result').get('fulfillment', {}).get('speech')
+        return NluResponse(json_response, next_message, action)
 
-    def ask(self, message):
+    def ask(self, event=None, message=None, session_id=None):
+        if event:
+            return self.ask_with_event(event)
+        if message and session_id:
+            return self.ask_with_message(message, session_id)
+
+    def ask_with_event(self, event):
+        request = self.apiai.text_request()
+        request.query = event.get('content')
+        request.session_id = '{}-{}'.format(event.get('channel'), event.get('sender').get('id'))
+        response = request.getresponse()
+        return self.parse_response(response)
+
+    def ask_with_message(self, message, session_id):
         request = self.apiai.text_request()
         request.query = message
-        content = request.getresponse().read().decode('utf-8')
-        response = json.loads(content)
+        request.session_id = session_id
+        response = request.getresponse()
         return self.parse_response(response)
 
 
@@ -227,10 +250,13 @@ class NluClientFactory(object):
         self.integrations_params = context.get('nlu')
 
     def get(self, vendor):
+        '''Returns a proper NluClient object'''
         return self.NAME_TO_CLIENT.get(vendor)(**self.integrations_params.get(vendor))
 
 
 class NluAction(object):
+    '''A NluAction class represents an intent identified action.'''
+
     def __init__(self, intent=None, parameters=None, action_incomplete=True):
         self.intent = intent
         self.parameters = parameters or {}
@@ -245,6 +271,7 @@ class NluAction(object):
 
 
 class NluResponse(object):
+    '''A NluResponse class containing a response from a NLU service.'''
     def __init__(self, response, next_message=None, action=None):
         self.raw_response = response
         self.action = action
