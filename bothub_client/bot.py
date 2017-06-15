@@ -4,9 +4,10 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 
 
 class BaseBot(object):
-    def __init__(self, channel_client=None, storage_client=None, event=None):
+    def __init__(self, channel_client=None, storage_client=None, nlu_client_factory=None, event=None):
         self.channel_client = channel_client
         self.storage_client = storage_client
+        self.nlu_client_factory = nlu_client_factory
         self.event = event
 
     def handle_message(self, event, context):
@@ -26,3 +27,6 @@ class BaseBot(object):
 
     def get_user_data(self, user_id=None, channel=None):
         return self.storage_client.get_user_data(user_id=user_id, channel=channel)
+
+    def nlu(self, vendor):
+        return self.nlu_client_factory.get(vendor)

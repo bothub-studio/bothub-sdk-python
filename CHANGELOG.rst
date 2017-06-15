@@ -1,3 +1,8 @@
+0.1.8
+-----
+
+* add NLU integration support
+
 0.1.7
 -----
 
