@@ -189,9 +189,60 @@ class LocMemStorageClient(Client):
         return self.get_user_data(channel, user_id)
 
 
-class LogClient(object):
-    def __init__(self, project_id, api_key, base_url, transport=None):
-        self.project_id = project_id
-        self.base_url = base_url
+class NluClient(object):
+    def get_response(self, message):
+        raise NotImplementedError()
+
+
+class ApiAiNluClient(NluClient):
+    def __init__(self, api_key):
         self.api_key = api_key
-        self.transport = transport
+        apiai_module = __import__('apiai')
+        self.apiai = apiai_module.ApiAI(api_key)
+
+    def parse_response(self, response):
+        action = NluAction(
+            response.get('result').get('action'),
+            response.get('parameters'),
+            response.get('result').get('actionIncomplete')
+        )
+        return NluResponse(response, action)
+
+    def get_response(self, message):
+        request = self.apiai.text_request()
+        request.query = message
+        content = request.getresponse().read().decode('utf-8')
+        response = json.loads(content)
+        return self.parse_response(response)
+
+
+class NluClientFactory(object):
+    NAME_TO_CLIENT = {
+        'apiai': ApiAiNluClient
+    }
+
+    def __init__(self, context):
+        self.integrations_params = context.get('nlu')
+
+    def get(self, vendor):
+        return self.NAME_TO_CLIENT.get(vendor)(**self.integrations_params.get(vendor))
+
+
+class NluAction(object):
+    def __init__(self, intent=None, parameters=None, action_incomplete=True):
+        self.intent = intent
+        self.parameters = parameters or {}
+        self.completed = not action_incomplete
+
+    def __repr__(self):
+        return "<NluAction '{}', completed: {}, args: {}>".format(
+            self.intent,
+            self.completed,
+            self.parameters
+        )
+
+
+class NluResponse(object):
+    def __init__(self, response, action=None):
+        self._response = response
+        self.action = action
