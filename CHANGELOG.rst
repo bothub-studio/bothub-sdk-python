@@ -1,3 +1,9 @@
+0.1.10
+------
+
+* change ask method to use also with an event object
+* set an user who sent a message as a default user for storage client
+
 0.1.9
 -----
 
