@@ -54,18 +54,10 @@ When a bot receives a message from an user, it triggers ``handle_message`` metho
 
 An ``event`` is a dict which contains following items:
 
-content
-  A message text received.
-
-channel
-  Which channel (messenger platform) sent a message.
-
-sender
-  Who sent a message. ``{"id": <user-id>, "name": "<username>}``
-
-raw_data
-  A raw data itself messenger platforms offers.
-
+* ``content``: A message text received.
+* ``channel``: Which channel (messenger platform) sent a message.
+* ``sender``: Who sent a message. ``{"id": <user-id>, "name": "<username>}``
+* ``raw_data``: A raw data itself messenger platforms offers.
 
 You can respond to this message with various tools we provides.
 
@@ -80,6 +72,24 @@ To send a message, use a ``self.send_message`` method with a message you want to
           self.send_message('hello')
 
 Most of case you can omit ``user_id`` and ``channel`` arguments or put values to those arguments to send a message to specific user rathan than whom sent a message to your bot.
+
+
+Storage
+-------
+
+To store/retreive some data, we provides following methods:
+
+* Project level
+
+ * ``self.set_project_data(data)``: set data to a project
+ * ``self.get_project_data()``: get data from a project
+
+* User level
+
+ * ``self.set_user_data(data, user_id=None, channel=None)``: set user data
+ * ``self.get_user_data(user_id=None, channel=None)``: get user data
+
+``data`` should be a dict. A keys which server has but not included in ``data`` key will be ignored not be deleted.
 
 
 NLU Integeration
