@@ -24,8 +24,9 @@ def get_channel_client(context):
 def handle_message(event, context, bot_class):
     channel = get_channel_client(context)
     storage = StorageClient.init_client(context, event=event)
+    nlu_client_factory = NluClientFactory(context)
 
-    bot = bot_class(channel_client=channel, storage_client=storage, event=event)
+    bot = bot_class(channel_client=channel, storage_client=storage, nlu_client_factory=nlu_client_factory, event=event)
     response = bot.handle_message(event, context)
     return {'response': response}
 
@@ -203,12 +204,13 @@ class ApiAiNluClient(NluClient):
     def parse_response(self, response):
         action = NluAction(
             response.get('result').get('action'),
-            response.get('parameters'),
+            response.get('result').get('parameters'),
             response.get('result').get('actionIncomplete')
         )
-        return NluResponse(response, action)
+        next_message = response.get('result').get('fulfillment', {}).get('speech')
+        return NluResponse(response, next_message, action)
 
-    def get_response(self, message):
+    def ask(self, message):
         request = self.apiai.text_request()
         request.query = message
         content = request.getresponse().read().decode('utf-8')
@@ -243,6 +245,7 @@ class NluAction(object):
 
 
 class NluResponse(object):
-    def __init__(self, response, action=None):
-        self._response = response
+    def __init__(self, response, next_message=None, action=None):
+        self.raw_response = response
         self.action = action
+        self.next_message = next_message
