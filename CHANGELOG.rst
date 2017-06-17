@@ -1,3 +1,8 @@
+0.1.11
+------
+
+* add rich widget message
+
 0.1.10
 ------
 
