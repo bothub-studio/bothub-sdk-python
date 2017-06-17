@@ -13,6 +13,7 @@ class Message(object):
                 'text': text
             }
         })
+        return self
 
     def add_url_button(self, text, url):
         self.model.append({

@@ -1,3 +1,8 @@
+0.1.12
+------
+
+* fix a bug which ``Message.set_text`` returns nothing
+
 0.1.11
 ------
 
