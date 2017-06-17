@@ -4,6 +4,7 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 
 import json
 
+from bothub_client.messages import Message
 from bothub_client.transports import HttpTransport
 from bothub_client.transports import ZmqTransport
 
@@ -97,7 +98,6 @@ class ZmqChannelClient(Client):
         data = {
             'channel': _channel,
             'receiver': _chat_id,
-            'message': message,
             'event': event,
             'context': {
                 'project_id': self.project_id,
@@ -105,17 +105,16 @@ class ZmqChannelClient(Client):
             },
             'extra': extra
         }
+
+        if isinstance(message, Message):
+            data['message'] = {
+                'model': message.model,
+                'event': message.event
+            }
+        else:
+            data['message'] = message
+
         self.transport.send_multipart([json.dumps(data).encode('utf8')])
-
-
-class ConsoleChannelClient(Client):
-    def __init__(self):
-        super(ConsoleChannelClient, self).__init__(None, None, None)
-
-    def send_message(self, chat_id, message, channel=None, event=None):
-        _channel = '[{}] '.format(chat_id) if channel else ''
-        _channel = '[{}:{}] '.format(channel, chat_id) if channel is not None else _channel
-        print('{}{}'.format(_channel, message))
 
 
 class StorageClient(Client):
@@ -152,34 +151,6 @@ class StorageClient(Client):
         return self.transport.get(
             '/projects/{}/channels/{}/users/{}'.format(self.project_id, channel, user_id)
         ).get('data') or {}
-
-    def set_current_user_data(self, data):
-        channel, user_id = self.current_user
-        self.set_user_data(channel, user_id, data)
-
-    def get_current_user_data(self):
-        channel, user_id = self.current_user
-        return self.get_user_data(channel, user_id)
-
-
-class LocMemStorageClient(Client):
-    def __init__(self, user=None):
-        super(LocMemStorageClient, self).__init__(None, None, None)
-        self.current_user = user
-        self.project_storage = {}
-        self.user_storage = {}
-
-    def set_project_data(self, data):
-        self.project_storage.update(**data)
-
-    def get_project_data(self):
-        return self.project_storage
-
-    def set_user_data(self, channel, user_id, data):
-        self.user_storage.update(**data)
-
-    def get_user_data(self, channel, user_id):
-        return self.user_storage
 
     def set_current_user_data(self, data):
         channel, user_id = self.current_user
