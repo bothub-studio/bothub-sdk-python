@@ -81,13 +81,13 @@ To store/retreive some data, we provides following methods:
 
 * Project level
 
- * ``self.set_project_data(data)``: set data to a project
- * ``self.get_project_data()``: get data from a project
+  * ``self.set_project_data(data)``: set data to a project
+  * ``self.get_project_data()``: get data from a project
 
 * User level
 
- * ``self.set_user_data(data, user_id=None, channel=None)``: set user data
- * ``self.get_user_data(user_id=None, channel=None)``: get user data
+  * ``self.set_user_data(data, user_id=None, channel=None)``: set user data
+  * ``self.get_user_data(user_id=None, channel=None)``: get user data
 
 ``data`` should be a dict. A keys which server has but not included in ``data`` key will be ignored not be deleted.
 
