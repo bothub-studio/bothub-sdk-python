@@ -62,3 +62,9 @@ class Message(object):
             }
         })
         return self
+
+    def __repr__(self):
+        s = []
+        for m in self.model:
+            s.append('{} {}'.format(m['command'], m['args']))
+        return '\n'.join(s)
