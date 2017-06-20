@@ -1,3 +1,11 @@
+0.1.13
+------
+
+* add a repr method to Message class
+* fix: Message.set_text returns nothing
+* fix: add payload argument which Facebook Messenger requires
+
+
 0.1.12
 ------
 

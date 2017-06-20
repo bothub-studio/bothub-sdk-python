@@ -35,12 +35,13 @@ class Message(object):
         })
         return self
 
-    def add_quick_reply(self, text, image_url=None):
+    def add_quick_reply(self, text, image_url=None, payload=None):
         self.model.append({
             'command': 'add_quick_reply',
             'args': {
                 'text': text,
-                'image_url': image_url
+                'image_url': image_url,
+                'payload': payload,
             }
         })
         return self
@@ -62,3 +63,9 @@ class Message(object):
             }
         })
         return self
+
+    def __repr__(self):
+        s = []
+        for m in self.model:
+            s.append('{} {}'.format(m['command'], m['args']))
+        return '\n'.join(s)
