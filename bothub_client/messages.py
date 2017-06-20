@@ -35,7 +35,7 @@ class Message(object):
         })
         return self
 
-    def add_quick_reply(self, text, image_url=None, payload=None):
+    def add_quick_reply(self, text, payload=None, image_url=None):
         self.model.append({
             'command': 'add_quick_reply',
             'args': {
