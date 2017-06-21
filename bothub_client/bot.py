@@ -25,12 +25,12 @@ class BaseBot(object):
     def set_user_data(self, data, user_id=None, channel=None):
         _user_id = user_id or self.event.get('sender', {}).get('id')
         _channel = channel or self.event.get('channel')
-        self.storage_client.set_user_data(data, user_id=_user_id, channel=_channel)
+        self.storage_client.set_user_data(_channel, _user_id, data)
 
     def get_user_data(self, user_id=None, channel=None):
         _user_id = user_id or self.event.get('sender', {}).get('id')
         _channel = channel or self.event.get('channel')
-        return self.storage_client.get_user_data(user_id=_user_id, channel=_channel)
+        return self.storage_client.get_user_data(_channel, user_id=_user_id)
 
     def nlu(self, vendor):
         return self.nlu_client_factory.get(vendor)
