@@ -1,3 +1,8 @@
+0.1.16
+------
+
+* use chat_id as a default for ZmqChannelClient
+
 0.1.15
 ------
 
