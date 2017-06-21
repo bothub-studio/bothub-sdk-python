@@ -13,8 +13,8 @@ class BaseBot(object):
     def handle_message(self, event, context):
         raise NotImplementedError()
 
-    def send_message(self, message, user_id=None, channel=None, extra=None):
-        self.channel_client.send_message(user_id, message, channel, event=self.event, extra=extra)
+    def send_message(self, message, chat_id=None, channel=None, extra=None):
+        self.channel_client.send_message(chat_id, message, channel, event=self.event, extra=extra)
 
     def set_project_data(self, data):
         self.storage_client.set_project_data(data)
