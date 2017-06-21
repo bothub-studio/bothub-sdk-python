@@ -1,3 +1,8 @@
+0.1.15
+------
+
+* use chat_id as a default
+
 0.1.14
 ------
 
