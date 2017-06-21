@@ -1,3 +1,8 @@
+0.1.17
+------
+
+* fix invalid method signature usage
+
 0.1.16
 ------
 
