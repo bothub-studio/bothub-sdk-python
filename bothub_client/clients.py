@@ -53,9 +53,9 @@ class ChannelClient(Client):
         return ChannelClient(project_id, api_key, channel_endpoint)
 
     def send_message(self, chat_id, message, channel=None, event=None, extra=None):
-        sender_id = event.get('sender', {}).get('id', None)
+        from_chat_id = event.get('chat_id')
         origin_channel = event.get('channel')
-        _chat_id = chat_id or sender_id
+        _chat_id = chat_id or from_chat_id
         _channel = channel or origin_channel
         self.transport.post('/messages', {
             'channel': _channel,
