@@ -1,3 +1,8 @@
+0.1.18
+------
+
+* use chat_id as an argument name instead of user_id
+
 0.1.17
 ------
 
