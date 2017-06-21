@@ -90,7 +90,7 @@ class ZmqChannelClient(Client):
                 return c
 
     def send_message(self, chat_id, message, channel=None, event=None, extra=None):
-        sender_id = event.get('sender', {}).get('id', None)
+        sender_id = event.get('chat_id')
         origin_channel = event.get('channel')
         _chat_id = chat_id or sender_id
         channel_type = channel or origin_channel
