@@ -61,7 +61,6 @@ class BaseChannelClient(Client):
 
     Send a message to  a messenger platform'''
     def __init__(self, project_id, api_key, base_url, transport=None, context=None):
-        _transport = transport or HttpTransport
         self.context = context
         super(BaseChannelClient, self).__init__(project_id, api_key, base_url, transport)
 
@@ -108,7 +107,8 @@ class ChannelClient(BaseChannelClient):
         project_id = context.get('project_id')
         api_key = context.get('api_key', '')
         channel_endpoint = context.get('channel', {}).get('endpoint')
-        return ChannelClient(project_id, api_key, channel_endpoint, context=context)
+        return ChannelClient(project_id, api_key, channel_endpoint,
+                             transport=HttpTransport, context=context)
 
     def send_message(self, chat_id, message, channel=None, event=None, extra=None):
         data = self._prepare_payload(chat_id, message, channel, event, extra)
@@ -124,7 +124,8 @@ class ZmqChannelClient(BaseChannelClient):
         project_id = context.get('project_id')
         api_key = context.get('api_key', '')
         channel_endpoint = context.get('channel', {}).get('endpoint')
-        return ZmqChannelClient(project_id, api_key, channel_endpoint, context=context)
+        return ZmqChannelClient(project_id, api_key, channel_endpoint,
+                                transport=ZmqTransport, context=context)
 
     def send_message(self, chat_id, message, channel=None, event=None, extra=None):
         data = self._prepare_payload(chat_id, message, channel, event, extra)
