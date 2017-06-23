@@ -1,3 +1,8 @@
+0.1.19
+------
+
+* refactor and add docstrings
+
 0.1.18
 ------
 
