@@ -1,3 +1,8 @@
+0.1.21
+------
+
+* fix a ZmqTransport init argument error
+
 0.1.20
 ------
 
