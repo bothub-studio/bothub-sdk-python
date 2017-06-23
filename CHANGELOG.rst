@@ -1,3 +1,8 @@
+0.1.20
+------
+
+* fix a ChannelClient initialization error
+
 0.1.19
 ------
 
