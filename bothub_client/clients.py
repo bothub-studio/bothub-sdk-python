@@ -125,7 +125,7 @@ class ZmqChannelClient(BaseChannelClient):
         api_key = context.get('api_key', '')
         channel_endpoint = context.get('channel', {}).get('endpoint')
         return ZmqChannelClient(project_id, api_key, channel_endpoint,
-                                transport=ZmqTransport, context=context)
+                                transport=ZmqTransport(channel_endpoint), context=context)
 
     def send_message(self, chat_id, message, channel=None, event=None, extra=None):
         data = self._prepare_payload(chat_id, message, channel, event, extra)
