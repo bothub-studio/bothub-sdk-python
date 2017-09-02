@@ -1,3 +1,9 @@
+0.1.22
+------
+
+* add a dispatcher
+* implement a default handle_message method which handles intents and commands
+
 0.1.21
 ------
 
