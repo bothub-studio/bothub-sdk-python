@@ -30,6 +30,7 @@ setup(
     install_requires=[
         'requests',
         'zmq',
+        'pyaml',
     ],
     setup_requires=[
         'pytest-runner',
