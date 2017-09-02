@@ -65,7 +65,7 @@ class BaseChannelClient(Client):
         super(BaseChannelClient, self).__init__(project_id, api_key, base_url, transport)
 
     def _get_channel_obj(self, channel_type):
-        channels = self.context['channel']['channels']
+        channels = self.context['channel'].get('channels', [])
         for channel in channels:
             if channel['type'] == channel_type:
                 return channel
