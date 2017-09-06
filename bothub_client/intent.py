@@ -40,7 +40,7 @@ class IntentState(object):
         intent_slots = []
         for intent_id in intents.keys():
             intent_yaml = intents[intent_id]
-            on_complete = intent_yaml.get('on_complete', 'on_{}'.format(intent_id))
+            on_complete = intent_yaml.get('on_complete', 'set_{}'.format(intent_id))
             slots_yaml = intent_yaml.get('slots', [])
             slot_objs = []
             for slot in slots_yaml:
