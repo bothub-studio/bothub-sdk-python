@@ -18,12 +18,12 @@ with open(path.join(HERE, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='bothub',
-    version='0.1.21',
+    version='0.1.22',
     description=u'Build serverless chatbot on BotHub.Studio',
     long_description=LONG_DESCRIPTION,
     author='Jeongsoo Park',
     author_email='jeongsoo.park@bothub.studio',
-    url='https://github.com/bothub-studio/bothub',
+    url='https://github.com/bothub-studio/bothub-sdk-python',
     license="AGPL v3",
     packages=find_packages(),
     include_package_data=True,
