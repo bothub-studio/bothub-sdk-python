@@ -2,6 +2,8 @@
 ------
 
 * fix: add a missing import
+* fix: lookup another location to find bothub.yml file
+
 
 0.1.22
 ------
