@@ -36,7 +36,10 @@ class BaseBot(object):
 
         bot_dir_path = os.path.dirname(os.path.realpath(__file__))
         yml_path = os.path.join(bot_dir_path, os.pardir, 'bothub.yml')
-        intent_slots = IntentState.load_intent_slots_from_yml(yml_path)
+        if os.path.isfile(yml_path):
+            intent_slots = IntentState.load_intent_slots_from_yml(yml_path)
+        else:
+            intent_slots = []
 
         state = IntentState(self, intent_slots)
         dispatcher = DefaultDispatcher(self, state)
