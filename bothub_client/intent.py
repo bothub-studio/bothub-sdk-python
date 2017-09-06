@@ -77,13 +77,13 @@ class IntentState(object):
         self.bot.set_user_data(data)
         return result
 
-    def on_complete(self, intent_id, **kwargs):
+    def on_complete(self, intent_id, event, context, **kwargs):
         data = self.bot.get_user_data()
         logger.debug('IntentState: on_complete intent %s', intent_id)
         intent = self.intent_id_to_intent_definition[intent_id]
         func_name = intent.on_complete
         func = getattr(self.bot, func_name)
-        func(**kwargs)
+        func(event, context, **kwargs)
 
     def _make_result_obj(self, data):
         next_message = self._next_slot_message(data)
