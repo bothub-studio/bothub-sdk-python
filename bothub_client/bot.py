@@ -2,6 +2,9 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+from bothub_client.intent import IntentState
+from bothub_client.dispatcher import DefaultDispatcher
+
 
 class BaseBot(object):
     '''A base Bot class'''
@@ -29,7 +32,18 @@ class BaseBot(object):
         :type event: dict
         :param context: a context Bot runs
         :type context: dict'''
-        raise NotImplementedError()
+        content = event.get('content')
+
+        bot_dir_path = os.path.dirname(os.path.realpath(__file__))
+        yml_path = os.path.join(bot_dir_path, os.pardir, 'bothub.yml')
+        if os.path.isfile(yml_path):
+            intent_slots = IntentState.load_intent_slots_from_yml(yml_path)
+        else:
+            intent_slots = []
+
+        state = IntentState(self, intent_slots)
+        dispatcher = DefaultDispatcher(self, state)
+        dispatcher.dispatch(event, context)
 
     def send_message(self, message, chat_id=None, channel=None, extra=None):
         '''Send a message to an user or chatroom.

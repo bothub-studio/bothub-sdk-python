@@ -31,13 +31,15 @@ def test_handle_message_should_add_channel_cmd_buff():
     }
 
     with requests_mock.mock() as m:
-        m.post('http://localhost/')
+        m.post('http://localhost/messages')
         response = handle_message(event, context, Bot)
         assert response['response'] is None
         assert m.called
         assert m.request_history[0].json() == {
-            'channel': 'mychannel',
-            'receiver': 'abcd1234',
+            'channel': None,
+            'receiver': None,
             'message': 'hello, you said: hi!',
-            'event': event
+            'event': event,
+            'extra': None,
+            'context': {'api_key': '', 'project_id': None}
         }

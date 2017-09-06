@@ -65,7 +65,7 @@ class BaseChannelClient(Client):
         super(BaseChannelClient, self).__init__(project_id, api_key, base_url, transport)
 
     def _get_channel_obj(self, channel_type):
-        channels = self.context['channel']['channels']
+        channels = self.context['channel'].get('channels', [])
         for channel in channels:
             if channel['type'] == channel_type:
                 return channel
@@ -108,7 +108,7 @@ class ChannelClient(BaseChannelClient):
         api_key = context.get('api_key', '')
         channel_endpoint = context.get('channel', {}).get('endpoint')
         return ChannelClient(project_id, api_key, channel_endpoint,
-                             transport=HttpTransport, context=context)
+                             transport=HttpTransport(channel_endpoint), context=context)
 
     def send_message(self, chat_id, message, channel=None, event=None, extra=None):
         data = self._prepare_payload(chat_id, message, channel, event, extra)
