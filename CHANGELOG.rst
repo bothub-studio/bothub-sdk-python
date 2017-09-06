@@ -1,3 +1,8 @@
+0.1.23
+------
+
+* fix: add a missing import
+
 0.1.22
 ------
 
