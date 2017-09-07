@@ -17,7 +17,7 @@ class DefaultDispatcher(object):
             result = self.state.next(event)
             if result.completed:
                 logger.debug('dispatch: intent completed')
-                self.state.on_complete(result.intent_id, **result.answers)
+                self.state.on_complete(result.intent_id, event, context, **result.answers)
             else:
                 self.bot.send_message(result.next_message)
             return

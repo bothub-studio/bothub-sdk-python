@@ -1,3 +1,9 @@
+0.1.24
+------
+
+* change: add `event`, `context` arguments to on_complete handler method
+* change: change a default on_complete handler method to have a prefix `set_` instead of `on_`
+
 0.1.23
 ------
 
