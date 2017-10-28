@@ -5,6 +5,9 @@ import logging
 logger = logging.getLogger('bothub.dispatcher')
 
 class DefaultDispatcher(object):
+    DEFAULT_HANDLER_NAME = 'on_default'
+    COMMAND_HANDLER_PATTERN = 'on_{command}'
+
     def __init__(self, bot, state):
         self.bot = bot
         self.state = state
@@ -37,9 +40,9 @@ class DefaultDispatcher(object):
             command = tokens[0][1:]
             logger.debug('dispatch: start command %s', command)
             args = tokens[1:]
-            func = getattr(self.bot, 'on_' + command)
+            func = getattr(self.bot, self.COMMAND_HANDLER_PATTERN.format(command=command))
             func(event, context, *args)
             return
 
-        func = getattr(self.bot, 'on_default')
+        func = getattr(self.bot, self.DEFAULT_HANDLER_NAME)
         func(event, context)
