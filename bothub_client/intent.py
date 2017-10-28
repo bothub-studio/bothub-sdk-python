@@ -70,7 +70,8 @@ class IntentState(object):
         if event:
             self._store_answer(event, data)
         result = self._make_result_obj(data)
-        if result.completed: self._clear_state(data)
+        if result.completed:
+            self._clear_state(data)
         self.bot.set_user_data(data)
         return result
 
