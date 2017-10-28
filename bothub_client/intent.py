@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import json
 import yaml
 from collections import namedtuple
 
@@ -76,7 +75,6 @@ class IntentState(object):
         return result
 
     def on_complete(self, intent_id, event, context, **kwargs):
-        data = self.bot.get_user_data()
         logger.debug('IntentState: on_complete intent %s', intent_id)
         intent = self.intent_id_to_intent_definition[intent_id]
         func_name = intent.on_complete
