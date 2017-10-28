@@ -5,8 +5,6 @@ import json
 import yaml
 from collections import namedtuple
 
-from bothub_client.dispatcher import DefaultDispatcher
-
 logger = logging.getLogger('bothub.intent')
 
 Intent = namedtuple('Intent', ['id', 'on_complete', 'slots'])
@@ -108,12 +106,9 @@ class IntentState(object):
         slot_id = data[self.slot_id_field]
         data.setdefault(self.intent_answers_field, {})[slot_id] = event['content']
 
-    def _load_slot(self, data):
-        slot = data[self.remaining_slots_field].pop(0)
-
     def _has_remainig_slots(self, data):
         return self.remaining_slots_field not in data or data[self.remaining_slots_field] is not None
-        
+
     def _next_slot_message(self, data):
         try:
             if not self._has_remainig_slots(data):

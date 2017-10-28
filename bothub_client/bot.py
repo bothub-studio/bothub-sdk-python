@@ -34,7 +34,6 @@ class BaseBot(object):
         :type event: dict
         :param context: a context Bot runs
         :type context: dict'''
-        content = event.get('content')
 
         bot_dir_path = os.path.realpath('.')
         yml_path = os.path.join(bot_dir_path, 'bothub.yml')
