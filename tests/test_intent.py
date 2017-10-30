@@ -57,7 +57,7 @@ def test_init_intent_should_set_init_entries():
     bot = MockBot()
     intent_slots = fixture_intent_slots()
     state = IntentState(bot, intent_slots)
-    state.init('credentials')
+    state.open('credentials')
     assert bot.data['_intent_id'] == 'credentials'
     assert bot.data['_remaining_slots'] == [
         {'id': 'app_id', 'question': 'Please tell me your app ID', 'datatype': 'string'},
@@ -69,7 +69,7 @@ def test_get_result_should_return_result_with_next_message():
     bot = MockBot()
     intent_slots = fixture_intent_slots()
     state = IntentState(bot, intent_slots)
-    state.init('credentials')
+    state.open('credentials')
     assert bot.data['_remaining_slots'] == [
         {'id': 'app_id', 'question': 'Please tell me your app ID', 'datatype': 'string'},
         {'id': 'app_secret', 'question': 'Please tell me your app secret', 'datatype': 'string'},
@@ -103,10 +103,11 @@ def test_get_result_should_raise_exception_when_exceeded_slots():
     bot = MockBot()
     intent_slots = fixture_intent_slots()
     state = IntentState(bot, intent_slots)
-    state.init('credentials')
-    state.next()
-    state.next()
-    state.next()
+    state.open('credentials')
+    state.next() # Returns IntentResult: q=Please tell me your app ID
+    state.next() # Returns IntentResult: q=Please tell me your app secret
+    result = state.next() # Returns IntentResult: complete=True
+    assert result.completed is True
 
     with pytest.raises(NoSlotRemainsException):
         state.next()
