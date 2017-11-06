@@ -50,7 +50,7 @@ class DefaultDispatcher(object):
 
         content = event.get('content')
 
-        if content is not None and self._is_intent_command(content):
+        if self._is_intent_command(content):
             intent_id = self._get_intent_id(content)
             logger.debug('dispatch: intent %s started', intent_id)
             self.state.open(intent_id)
@@ -58,7 +58,7 @@ class DefaultDispatcher(object):
             self.bot.send_message(result.next_message)
             return
 
-        if content is not None and self._is_command(content):
+        if self._is_command(content):
             command, args = self._get_command_args(content)
             logger.debug('dispatch: start command %s', command)
             try:
@@ -97,10 +97,10 @@ class DefaultDispatcher(object):
         handler_func(event, context)
 
     def _is_command(self, content):
-        return content.startswith('/')
+        return content is not None and content.startswith('/')
 
     def _is_intent_command(self, content):
-        return content.startswith('/intent ')
+        return content is not None and content.startswith('/intent ')
 
     def _get_intent_id(self, content):
         _, intent_id = content.split()
