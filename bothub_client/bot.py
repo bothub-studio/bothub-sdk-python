@@ -10,7 +10,7 @@ from bothub_client.dispatcher import DefaultDispatcher
 class BaseBot(object):
     '''A base Bot class'''
 
-    def __init__(self, channel_client=None, storage_client=None, nlu_client_factory=None, event=None):
+    def __init__(self, channel_client=None, storage_client=None, nlu_client_factory=None, event=None, dispatcher_class=None):
         '''Initialize an object
 
         :param channel_client: a ChannelClient object
@@ -33,7 +33,8 @@ class BaseBot(object):
             self.intent_slots = []
 
         self.state = IntentState(self, self.intent_slots)
-        self.dispatcher = DefaultDispatcher(self, self.state)
+        _dispatcher_class = dispatcher_class or DefaultDispatcher
+        self.dispatcher = _dispatcher_class(self, self.state)
 
     def handle_message(self, event, context):
         '''Handle a message which messenger platform sent
