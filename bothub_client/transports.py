@@ -22,8 +22,8 @@ class HttpTransport(object):
 
 
 class ZmqTransport(object):
-    def __init__(self, address):
-        self.context = zmq.Context()
+    def __init__(self, address, context=None):
+        self.context = context or zmq.Context()
         self.socket = self.context.socket(zmq.PUSH)
         self.socket.connect(address)
 
