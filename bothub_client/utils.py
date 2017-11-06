@@ -25,7 +25,8 @@ def get_decorators(cls):
             else:
                 name = n.attr if isinstance(n, ast.Attribute) else n.id
 
-            decorators[node.name].append((name, [a.s for a in n.args]))
+            args = [a.s for a in n.args] if hasattr(n, 'args') else []
+            decorators[node.name].append((name, args))
 
     node_iter = ast.NodeVisitor()
     node_iter.visit_FunctionDef = visit_FunctionDef

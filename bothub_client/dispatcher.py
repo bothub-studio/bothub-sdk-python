@@ -71,19 +71,27 @@ class DefaultDispatcher(object):
         if self._is_command(content):
             command, args = self._get_command_args(content)
             logger.debug('dispatch: start command %s', command)
-            handler_func = getattr(self.bot, self.command_handler_pattern.format(command=command))
+            handler_func = getattr(self.bot, self.command_handlers[command])
             handler_func(event, context, *args)
             return
 
         current_channel = event.get('channel')
-        if current_channel is None or current_channel not in self.channel_handlers:
+        if current_channel is None:
+            return
+
+        if current_channel not in self.channel_handlers:
             channel_handler = self.channel_handlers.get('default', None)
         else:
             channel_handler = self.channel_handlers[event['channel']]
 
-        if channel_handler:
-            handler_func = getattr(self.bot, channel_handler)
-            handler_func(event, context)
+        if not channel_handler:
+            return
+
+        handler_func = getattr(self.bot, channel_handler)
+        handler_func(event, context)
+
+    def _is_command(self, content):
+        return content.startswith('/')
 
     def _is_intent_command(self, content):
         return content.startswith('/intent ')
@@ -91,9 +99,6 @@ class DefaultDispatcher(object):
     def _get_intent_id(self, content):
         _, intent_id = content.split()
         return intent_id
-
-    def _is_command(self, content):
-        return content.startswith('/')
 
     def _get_command_args(self, content):
         tokens = content.split()

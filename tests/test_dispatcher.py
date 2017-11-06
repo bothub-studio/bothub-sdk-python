@@ -27,7 +27,7 @@ class MockBot(object):
         json_data = json.loads(data_json_str)
         self.data.update(**json_data)
 
-    @channel('default')
+    @channel()
     def on_default(self, *args):
         self.executed.append(Executed('on_default', args))
 
