@@ -79,6 +79,7 @@ class DefaultDispatcher(object):
         if current_channel is None:
             return
 
+        channel_handler = None
         if current_channel not in self.channel_handlers:
             channel_handler = self.channel_handlers.get('default', None)
         else:
