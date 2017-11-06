@@ -51,6 +51,12 @@ class BaseBot(object):
 
         :param message: a message to send. it can be a str text or Message class object
         :type message: str, bothub_client.messages.Message
+        :param chat_id: receiver chat id
+        :type chat_id: str
+        :param channel: receiver channel name
+        :type channel: str
+        :param extra: deprecated
+        :type extra: dict
         :return: None'''
         self.channel_client.send_message(chat_id, message, channel, event=self.event, extra=extra)
 
