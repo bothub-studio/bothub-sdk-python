@@ -47,16 +47,6 @@ class DefaultDispatcher(object):
         :type content: dict
         '''
         logger.debug('dispatch: started')
-        if self.state.is_opened():
-            logger.debug('dispatch: continue to process intent')
-            result = self.state.next(event)
-            if result.completed:
-                logger.debug('dispatch: intent completed')
-                handler_func = getattr(self.bot, self.intent_handlers[result.intent_id])
-                handler_func(event, context, result.answers)
-            else:
-                self.bot.send_message(result.next_message)
-            return
 
         content = event['content']
 
@@ -78,6 +68,17 @@ class DefaultDispatcher(object):
             except KeyError:
                 self.bot.send_message('No such command: {}'.format(command))
                 return
+
+        if self.state.is_opened():
+            logger.debug('dispatch: continue to process intent')
+            result = self.state.next(event)
+            if result.completed:
+                logger.debug('dispatch: intent completed')
+                handler_func = getattr(self.bot, self.intent_handlers[result.intent_id])
+                handler_func(event, context, result.answers)
+            else:
+                self.bot.send_message(result.next_message)
+            return
 
         current_channel = event.get('channel')
         if current_channel is None:
