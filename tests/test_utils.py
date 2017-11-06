@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from bothub_client.utils import traceback_to_string
 from bothub_client.utils import get_decorators
 from bothub_client.decorators import command, intent
 
@@ -28,3 +29,11 @@ def test_get_decorators_with_obj_should_returns_decorators():
     assert get_decorators(TestDecorator()) == {'iamcommand': [('command', ['start'])],
                                                'iamcommand_too': [('command', ['reply'])],
                                                'iamintent': [('intent', ['credentials'])]}
+
+
+def test_traceback_to_string_should_return_string():
+    try:
+        raise KeyError()
+    except KeyError as e:
+        s = traceback_to_string(e)
+        assert 'raise KeyError()' in s
