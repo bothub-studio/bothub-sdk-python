@@ -48,7 +48,7 @@ class DefaultDispatcher(object):
         '''
         logger.debug('dispatch: started')
 
-        content = event['content']
+        content = event.get('content')
 
         if self._is_intent_command(content):
             intent_id = self._get_intent_id(content)
@@ -88,7 +88,7 @@ class DefaultDispatcher(object):
         if current_channel not in self.channel_handlers:
             channel_handler = self.channel_handlers.get('default', None)
         else:
-            channel_handler = self.channel_handlers[event['channel']]
+            channel_handler = self.channel_handlers[current_channel]
 
         if not channel_handler:
             return
