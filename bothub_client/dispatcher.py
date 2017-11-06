@@ -35,7 +35,7 @@ class DefaultDispatcher(object):
                 handler_dict = dec_type_to_handler_dict.get(dec_type)
                 if handler_dict is None:
                     continue
-                handler_name = args[0] if len(args) > 0 else 'default'
+                handler_name = args[0] if args else 'default'
                 handler_dict[handler_name] = method_name
 
     def dispatch(self, event, context):
