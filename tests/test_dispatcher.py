@@ -59,7 +59,7 @@ def test_simple_message_dispatch_should_call_on_default():
     state = IntentState(bot, intent_slots)
     dispatcher = DefaultDispatcher(bot, state)
 
-    event = {'content': 'hello'}
+    event = {'content': 'hello', 'channel': 'fakechannel'}
     dispatcher.dispatch(event, None)
 
     executed = bot.executed.pop(0) # type: Executed

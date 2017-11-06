@@ -121,12 +121,12 @@ def test_dispatch_should_execute_default():
     intent_slots = fixture_intent_slots()
     state = IntentState(bot, intent_slots)
     dispatcher = DefaultDispatcher(bot, state)
-    dispatcher.dispatch({'content': 'hello'}, None)
+    dispatcher.dispatch({'content': 'hello', 'channel': 'fakechannel'}, None)
     assert len(bot.executed) == 1
     executed = bot.executed.pop(0)
     assert executed == Executed(
         'on_default',
-        ({'content': 'hello'}, None)
+        ({'content': 'hello', 'channel': 'fakechannel'}, None)
     )
 
 
@@ -150,12 +150,13 @@ def test_dispatch_should_trigger_intent_and_default():
     intent_slots = fixture_intent_slots()
     state = IntentState(bot, intent_slots)
     dispatcher = DefaultDispatcher(bot, state)
-    dispatcher.dispatch({'content': '/intent credentials'}, None)
-    dispatcher.dispatch({'content': 'my token'}, None)
-    dispatcher.dispatch({'content': 'my secret token'}, None)
-    dispatcher.dispatch({'content': 'hello'}, None)
+    dispatcher.dispatch({'content': '/intent credentials', 'channel': 'fakechannel'}, None)
+    dispatcher.dispatch({'content': 'my token', 'channel': 'fakechannel'}, None)
+    dispatcher.dispatch({'content': 'my secret token', 'channel': 'fakechannel'}, None)
+    dispatcher.dispatch({'content': 'hello', 'channel': 'fakechannel'}, None)
     assert len(bot.executed) == 2
     executed = bot.executed.pop(0)
     assert executed == Executed('set_credentials', ('my token', 'my secret token'))
     executed = bot.executed.pop(0)
-    assert executed == Executed('on_default', ({'content': 'hello'}, None))
+    assert executed == Executed('on_default', ({'content': 'hello', 'channel': 'fakechannel'},
+                                               None))
