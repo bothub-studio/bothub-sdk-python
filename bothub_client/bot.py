@@ -25,6 +25,15 @@ class BaseBot(object):
         self.storage_client = storage_client
         self.nlu_client_factory = nlu_client_factory
         self.event = event
+        bot_dir_path = os.path.realpath('.')
+        yml_path = os.path.join(bot_dir_path, 'bothub.yml')
+        if os.path.isfile(yml_path):
+            self.intent_slots = IntentState.load_intent_slots_from_yml(yml_path)
+        else:
+            self.intent_slots = []
+
+        self.state = IntentState(self, self.intent_slots)
+        self.dispatcher = DefaultDispatcher(self, self.state)
 
     def handle_message(self, event, context):
         '''Handle a message which messenger platform sent
@@ -34,16 +43,7 @@ class BaseBot(object):
         :param context: a context Bot runs
         :type context: dict'''
 
-        bot_dir_path = os.path.realpath('.')
-        yml_path = os.path.join(bot_dir_path, 'bothub.yml')
-        if os.path.isfile(yml_path):
-            intent_slots = IntentState.load_intent_slots_from_yml(yml_path)
-        else:
-            intent_slots = []
-
-        state = IntentState(self, intent_slots)
-        dispatcher = DefaultDispatcher(self, state)
-        dispatcher.dispatch(event, context)
+        self.dispatcher.dispatch(event, context)
 
     def send_message(self, message, chat_id=None, channel=None, extra=None):
         '''Send a message to an user or chatroom.
