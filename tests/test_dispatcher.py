@@ -13,7 +13,7 @@ from bothub_client.decorators import channel
 Executed = namedtuple('Executed', ['command', 'args'])
 
 
-class MockBot:
+class MockBot(object):
     def __init__(self):
         self.data = {}
         self.executed = []
