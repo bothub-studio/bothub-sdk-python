@@ -6,8 +6,8 @@ from collections import namedtuple
 
 logger = logging.getLogger('bothub.intent')
 
-Intent = namedtuple('Intent', ['id', 'on_complete', 'slots'])
-IntentResult = namedtuple('IntentResult', ['intent_id', 'completed', 'answers', 'next_message', 'complete_handler_name'])
+Intent = namedtuple('Intent', ['id', 'slots'])
+IntentResult = namedtuple('IntentResult', ['intent_id', 'completed', 'answers', 'next_message'])
 Slot = namedtuple('Slot', ['id', 'question', 'datatype'])
 
 
@@ -113,12 +113,10 @@ class IntentState(object):
         next_message = self._next_slot_message(data)
         completed = next_message is None
         intent_id = data[self.intent_id_field]
-        intent = self.intent_id_to_intent_definition[intent_id]
         result = IntentResult(intent_id,
                               completed,
                               dict(data[self.intent_answers_field].items()),
-                              next_message,
-                              intent.on_complete)
+                              next_message)
         return result
 
     def _clear_state(self, data):

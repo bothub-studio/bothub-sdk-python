@@ -6,6 +6,9 @@ from bothub_client.dispatcher import DefaultDispatcher
 from bothub_client.intent import Intent
 from bothub_client.intent import Slot
 from bothub_client.intent import IntentState
+from bothub_client.decorators import command
+from bothub_client.decorators import intent
+from bothub_client.decorators import channel
 
 Executed = namedtuple('Executed', ['command', 'args'])
 
@@ -24,23 +27,25 @@ class MockBot:
         json_data = json.loads(data_json_str)
         self.data.update(**json_data)
 
+    @channel('default')
     def on_default(self, *args):
         self.executed.append(Executed('on_default', args))
 
     def send_message(self, message):
         self.sent.append(message)
 
-    def set_credentials(self, app_id, app_secret):
-        self.executed.append(Executed('set_credentials', (app_id, app_secret)))
+    @intent('credentials')
+    def set_credentials(self, event, context, answers):
+        self.executed.append(Executed('set_credentials', (answers['app_id'], answers['app_secret'])))
 
 
 def fixture_intent_slots():
     return [
-        Intent('credentials', 'set_credentials', [
+        Intent('credentials', [
             Slot('app_id', 'Please tell me your app ID', 'string'),
             Slot('app_secret', 'Please tell me your app secret', 'string'),
         ]),
-        Intent('address', 'set_address', [
+        Intent('address', [
             Slot('country', 'Please tell me your country', 'string'),
             Slot('city', 'Please tell me your city', 'string'),
             Slot('road', 'Please tell me your road address', 'string'),

@@ -3,7 +3,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 import os
-
+from functools import wraps
 from bothub_client.intent import IntentState
 from bothub_client.dispatcher import DefaultDispatcher
 
