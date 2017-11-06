@@ -71,9 +71,13 @@ class DefaultDispatcher(object):
         if self._is_command(content):
             command, args = self._get_command_args(content)
             logger.debug('dispatch: start command %s', command)
-            handler_func = getattr(self.bot, self.command_handlers[command])
-            handler_func(event, context, *args)
-            return
+            try:
+                handler_func = getattr(self.bot, self.command_handlers[command])
+                handler_func(event, context, *args)
+                return
+            except KeyError:
+                self.bot.send_message('No such command: {}'.format(command))
+                return
 
         current_channel = event.get('channel')
         if current_channel is None:
