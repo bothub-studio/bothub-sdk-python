@@ -44,6 +44,7 @@ def handle_message(event, context, bot_class):
     bot = bot_class(channel_client=channel, storage_client=storage,
                     nlu_client_factory=nlu_client_factory, event=event)
     response = bot.handle_message(event, context)
+    bot.close()
     return {'response': response}
 
 
@@ -114,6 +115,9 @@ class ChannelClient(BaseChannelClient):
         data = self._prepare_payload(chat_id, message, channel, event, extra)
         self.transport.post('/messages', data)
 
+    def close(self):
+        pass
+
 
 class ZmqChannelClient(BaseChannelClient):
     '''A ChannelClient class using ZeroMQ
@@ -131,6 +135,9 @@ class ZmqChannelClient(BaseChannelClient):
     def send_message(self, chat_id, message, channel=None, event=None, extra=None):
         data = self._prepare_payload(chat_id, message, channel, event, extra)
         self.transport.send_multipart([json.dumps(data).encode('utf8')])
+
+    def close(self):
+        self.transport.close()
 
 
 class StorageClient(Client):

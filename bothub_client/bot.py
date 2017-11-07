@@ -122,3 +122,6 @@ class BaseBot(object):
         else:
             _user_id, _channel = _event.get('sender', {}).get('id'), _event.get('channel')
         return _user_id, _channel
+
+    def close(self):
+        self.channel_client.close()

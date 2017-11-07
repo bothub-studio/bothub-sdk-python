@@ -32,3 +32,6 @@ class ZmqTransport(object):
 
     def send_multipart(self, data):
         return self.socket.send_multipart(data)
+
+    def close(self):
+        pass
