@@ -43,7 +43,6 @@ class IntentState(object):
         intent_slots = []
         for intent_id in intents.keys():
             intent_yaml = intents[intent_id]
-            on_complete = intent_yaml.get('on_complete', 'set_{}'.format(intent_id))
             slots_yaml = intent_yaml.get('slots', [])
             slot_objs = []
             for slot in slots_yaml:
@@ -52,7 +51,7 @@ class IntentState(object):
                 datatype = slot.get('datatype', 'string')
                 slot_obj = Slot(_id, question, datatype)
                 slot_objs.append(slot_obj)
-            intent = Intent(intent_id, on_complete, slot_objs)
+            intent = Intent(intent_id, slot_objs)
             intent_slots.append(intent)
         return intent_slots
 
