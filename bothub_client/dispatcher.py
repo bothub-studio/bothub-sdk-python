@@ -2,6 +2,7 @@
 
 import logging
 from bothub_client.utils import get_decorators
+from bothub_client.messages import Message
 
 logger = logging.getLogger('bothub.dispatcher')
 
@@ -51,7 +52,7 @@ class DefaultDispatcher(object):
         content = event.get('content')
 
         if self._is_intent_command(content):
-            self.open_intent(content)
+            self.open_intent(event, content)
             return
 
         if self._is_command(content):
@@ -76,12 +77,17 @@ class DefaultDispatcher(object):
         handler_func = getattr(self.bot, channel_handler)
         handler_func(event, context)
 
-    def open_intent(self, content):
+    def open_intent(self, event, content):
         intent_id = self._get_intent_id(content)
         logger.debug('dispatch: intent %s started', intent_id)
         self.state.open(intent_id)
         result = self.state.next()
-        self.bot.send_message(result.next_message)
+        message = Message(event)
+        message.set_text(result.next_message)
+        if result.replies:
+            for reply in result.replies:
+                message.add_quick_reply(reply)
+        self.bot.send_message(message)
 
     def execute_command(self, event, context, content):
         command, args = self._get_command_args(content)
@@ -100,7 +106,12 @@ class DefaultDispatcher(object):
             handler_func = getattr(self.bot, self.intent_handlers[result.intent_id])
             handler_func(event, context, result.answers)
         else:
-            self.bot.send_message(result.next_message)
+            message = Message(event)
+            message.set_text(result.next_message)
+            if result.replies:
+                for reply in result.replies:
+                    message.add_quick_reply(reply)
+            self.bot.send_message(message)
 
     def _is_command(self, content):
         return content is not None and content.startswith('/')
