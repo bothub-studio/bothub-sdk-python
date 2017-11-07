@@ -38,6 +38,10 @@ class MockBot(object):
     def set_credentials(self, event, context, answers):
         self.executed.append(Executed('set_credentials', (answers['app_id'], answers['app_secret'])))
 
+    @command('hello')
+    def hello(self, event, context):
+        self.executed.append(Executed('hello', [event, context]))
+
 
 def fixture_intent_slots():
     return [
@@ -53,7 +57,7 @@ def fixture_intent_slots():
     ]
 
 
-def test_simple_message_dispatch_should_call_on_default():
+def test_simple_message_dispatch_should_call_default_channel_handler():
     bot = MockBot()
     intent_slots = fixture_intent_slots()
     state = IntentState(bot, intent_slots)
@@ -65,3 +69,17 @@ def test_simple_message_dispatch_should_call_on_default():
     executed = bot.executed.pop(0) # type: Executed
     assert executed.command == 'on_default'
     assert executed.args == (event, None)
+
+
+def test_simple_message_dispatch_should_call_execute_command():
+    bot = MockBot()
+    intent_slots = fixture_intent_slots()
+    state = IntentState(bot, intent_slots)
+    dispatcher = DefaultDispatcher(bot, state)
+
+    event = {'content': '/hello', 'channel': 'fakechannel'}
+    dispatcher.dispatch(event, None)
+
+    executed = bot.executed.pop(0) # type: Executed
+    assert executed.command == 'hello'
+    assert executed.args == [event, None]

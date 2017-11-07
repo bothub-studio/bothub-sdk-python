@@ -160,3 +160,9 @@ def test_dispatch_should_trigger_intent_and_default():
     executed = bot.executed.pop(0)
     assert executed == Executed('on_default', ({'content': 'hello', 'channel': 'fakechannel'},
                                                None))
+
+
+def test_intent_state_load_intent_slots_should_return_intent_slots():
+    intent_slots = IntentState.load_intent_slots_from_yml('tests/fixtures/test_bothub.yml')
+    assert intent_slots == [Intent('age', [Slot('age', 'How old are you?', 'string'),
+                                           Slot('name', 'What is your name?', 'string')])]
