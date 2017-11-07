@@ -51,50 +51,56 @@ class DefaultDispatcher(object):
         content = event.get('content')
 
         if self._is_intent_command(content):
-            intent_id = self._get_intent_id(content)
-            logger.debug('dispatch: intent %s started', intent_id)
-            self.state.open(intent_id)
-            result = self.state.next()
-            self.bot.send_message(result.next_message)
+            self.open_intent(content)
             return
 
         if self._is_command(content):
-            command, args = self._get_command_args(content)
-            logger.debug('dispatch: start command %s', command)
-            try:
-                handler_func = getattr(self.bot, self.command_handlers[command])
-                handler_func(event, context, *args)
-                return
-            except KeyError:
-                self.bot.send_message('No such command: {}'.format(command))
-                return
+            self.execute_command(event, context, content)
+            return
 
         if self.state.is_opened():
-            logger.debug('dispatch: continue to process intent')
-            result = self.state.next(event)
-            if result.completed:
-                logger.debug('dispatch: intent completed')
-                handler_func = getattr(self.bot, self.intent_handlers[result.intent_id])
-                handler_func(event, context, result.answers)
-            else:
-                self.bot.send_message(result.next_message)
+            self.proceed_intent(event, context)
             return
 
         current_channel = event.get('channel')
         if current_channel is None:
             return
 
-        channel_handler = None
-        if current_channel not in self.channel_handlers:
-            channel_handler = self.channel_handlers.get('default', None)
-        else:
-            channel_handler = self.channel_handlers[current_channel]
+        channel_handler = self.channel_handlers.get('default', None) \
+                          if current_channel not in self.channel_handlers else \
+                          self.channel_handlers[current_channel]
 
         if not channel_handler:
             return
 
         handler_func = getattr(self.bot, channel_handler)
         handler_func(event, context)
+
+    def open_intent(self, content):
+        intent_id = self._get_intent_id(content)
+        logger.debug('dispatch: intent %s started', intent_id)
+        self.state.open(intent_id)
+        result = self.state.next()
+        self.bot.send_message(result.next_message)
+
+    def execute_command(self, event, context, content):
+        command, args = self._get_command_args(content)
+        logger.debug('dispatch: start command %s', command)
+        try:
+            handler_func = getattr(self.bot, self.command_handlers[command])
+            handler_func(event, context, *args)
+        except KeyError:
+            self.bot.send_message('No such command: {}'.format(command))
+
+    def proceed_intent(self, event, context):
+        logger.debug('dispatch: continue to process intent')
+        result = self.state.next(event)
+        if result.completed:
+            logger.debug('dispatch: intent completed')
+            handler_func = getattr(self.bot, self.intent_handlers[result.intent_id])
+            handler_func(event, context, result.answers)
+        else:
+            self.bot.send_message(result.next_message)
 
     def _is_command(self, content):
         return content is not None and content.startswith('/')
