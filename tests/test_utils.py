@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import sys
 from bothub_client.utils import traceback_to_string
 from bothub_client.utils import get_decorators
 from bothub_client.decorators import command, intent
@@ -35,5 +36,8 @@ def test_traceback_to_string_should_return_string():
     try:
         raise KeyError()
     except KeyError as e:
-        s = traceback_to_string(e)
+        tb = None
+        if sys.version_info < (3, 0):
+            _, _, tb = sys.exc_info()
+        s = traceback_to_string(e, tb=tb)
         assert 'raise KeyError()' in s

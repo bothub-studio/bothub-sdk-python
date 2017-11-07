@@ -4,11 +4,13 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 
 import ast
 import inspect
+import sys
 import traceback
 
 
-def traceback_to_string(exc):
-    s = traceback.extract_stack()[:-3] + traceback.extract_tb(exc.__traceback__)
+def traceback_to_string(exc, tb=None):
+    _tb = tb or exc.__traceback__
+    s = traceback.extract_stack()[:-3] + traceback.extract_tb(_tb)
     l = traceback.format_list(s)
     return ''.join(l) + '\\n  {} {}'.format(exc.__class__, exc)
 

@@ -120,12 +120,13 @@ class ZmqChannelClient(BaseChannelClient):
 
     Send a message to  a messenger platform'''
     @staticmethod
-    def init_client(context):
+    def init_client(context, transport=None):
         project_id = context.get('project_id')
         api_key = context.get('api_key', '')
         channel_endpoint = context.get('channel', {}).get('endpoint')
+        _transport = transport or ZmqTransport(channel_endpoint)
         return ZmqChannelClient(project_id, api_key, channel_endpoint,
-                                transport=ZmqTransport(channel_endpoint), context=context)
+                                transport=_transport, context=context)
 
     def send_message(self, chat_id, message, channel=None, event=None, extra=None):
         data = self._prepare_payload(chat_id, message, channel, event, extra)
