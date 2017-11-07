@@ -36,6 +36,40 @@ def test_set_project_data():
     transport = MockTransport()
 
     client = fixture_client(transport)
-    client.set_project_data({
-        'score': 11
-    })
+    client.set_project_data({'score': 11})
+
+    assert transport.executed.pop(0) == ('put',
+                                         {'url': '/projects/1',
+                                          'data': {'data': {'score': 11}}})
+
+
+def test_get_project_data():
+    transport = MockTransport()
+    transport.record({})
+
+    client = fixture_client(transport)
+    client.get_project_data()
+
+    assert transport.executed.pop(0) == ('get', {'url': '/projects/1'})
+
+
+def test_set_user_data():
+    transport = MockTransport()
+
+    client = fixture_client(transport)
+    client.set_user_data('mychannel', 'yourid', {'score': 11})
+
+    assert transport.executed.pop(0) == ('put',
+                                         {'url': '/projects/1/channels/mychannel/users/yourid',
+                                          'data': {'data': {'score': 11}}})
+
+
+def test_get_user_data():
+    transport = MockTransport()
+    transport.record({})
+
+    client = fixture_client(transport)
+    client.get_user_data('mychannel', 'yourid')
+
+    assert transport.executed.pop(0) == ('get',
+                                         {'url': '/projects/1/channels/mychannel/users/yourid'})
