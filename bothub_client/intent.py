@@ -7,8 +7,8 @@ from collections import namedtuple
 logger = logging.getLogger('bothub.intent')
 
 Intent = namedtuple('Intent', ['id', 'slots'])
-IntentResult = namedtuple('IntentResult', ['intent_id', 'completed', 'answers', 'next_message'])
-Slot = namedtuple('Slot', ['id', 'question', 'datatype'])
+IntentResult = namedtuple('IntentResult', ['intent_id', 'completed', 'answers', 'next_message', 'replies'])
+Slot = namedtuple('Slot', ['id', 'question', 'replies', 'datatype'])
 
 
 class NoSlotRemainsException(Exception):
@@ -48,8 +48,12 @@ class IntentState(object):
             for slot in slots_yaml:
                 _id = slot['id']
                 question = slot['question']
+                try:
+                    replies = slot['replies']
+                except KeyError:
+                    replies = []
                 datatype = slot.get('datatype', 'string')
-                slot_obj = Slot(_id, question, datatype)
+                slot_obj = Slot(_id, question, replies, datatype)
                 slot_objs.append(slot_obj)
             intent = Intent(intent_id, slot_objs)
             intent_slots.append(intent)
@@ -109,13 +113,14 @@ class IntentState(object):
         self.bot.set_user_data(data)
 
     def _make_result_obj(self, data):
-        next_message = self._next_slot_message(data)
+        next_message, replies = self._next_slot_message(data)
         completed = next_message is None
         intent_id = data[self.intent_id_field]
         result = IntentResult(intent_id,
                               completed,
                               dict(data[self.intent_answers_field].items()),
-                              next_message)
+                              next_message,
+                              replies)
         return result
 
     def _clear_state(self, data):
@@ -141,6 +146,6 @@ class IntentState(object):
             slot = data[self.remaining_slots_field].pop(0)
             data[self.slot_id_field] = slot['id']
             data[self.slot_datatype_field] = slot['datatype']
-            return slot['question']
+            return slot['question'], slot['replies']
         except IndexError:
-            return None
+            return None, None
