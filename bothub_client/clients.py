@@ -45,6 +45,7 @@ def handle_message(event, context, bot_class):
                     nlu_client_factory=nlu_client_factory, event=event)
     response = bot.handle_message(event, context)
     bot.close()
+    channel.close()
     return {'response': response}
 
 
