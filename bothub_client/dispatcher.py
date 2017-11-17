@@ -82,12 +82,12 @@ class DefaultDispatcher(object):
         logger.debug('dispatch: intent %s started', intent_id)
         self.state.open(intent_id)
         result = self.state.next()
-        self.bot.send_message(result.next_message)
-        if result.replies:
-            for reply in result.replies:
-                message = Message(event)
-                message.add_quick_reply(reply)
-                self.bot.send_message(message)
+        message = Message(event)
+        message.set_text(result.next_message)
+        if result.options:
+            for option in result.options:
+                message.add_postback_button(option, option)
+        self.bot.send_message(message)
 
     def execute_command(self, event, context, content):
         command, args = self._get_command_args(content)
@@ -106,12 +106,12 @@ class DefaultDispatcher(object):
             handler_func = getattr(self.bot, self.intent_handlers[result.intent_id])
             handler_func(event, context, result.answers)
         else:
-            self.bot.send_message(result.next_message)
-            if result.replies:
-                for reply in result.replies:
-                    message = Message(event)
-                    message.add_quick_reply(reply)
-                    self.bot.send_message(message)
+            message = Message(event)
+            message.set_text(result.next_message)
+            if result.options:
+                for option in result.options:
+                    message.add_postback_button(option, option)
+            self.bot.send_message(message)
 
     def _is_command(self, content):
         return content is not None and content.startswith('/')
