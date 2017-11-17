@@ -35,4 +35,3 @@ class ZmqTransport(object):
 
     def close(self):
         self.socket.close()
-        self.context.close()
