@@ -6,8 +6,8 @@ from collections import namedtuple
 
 logger = logging.getLogger('bothub.intent')
 
-Intent = namedtuple('Intent', ['id', 'slots'])
-IntentResult = namedtuple('IntentResult', ['intent_id', 'completed', 'answers', 'next_message', 'options'])
+Intent = namedtuple('Intent', ['id', 'on_complete', 'slots'])
+IntentResult = namedtuple('IntentResult', ['intent_id', 'completed', 'answers', 'next_message', 'complete_handler_name', 'options'])
 Slot = namedtuple('Slot', ['id', 'question', 'options', 'datatype'])
 
 
@@ -44,6 +44,7 @@ class IntentState(object):
         for intent_id in intents.keys():
             intent_yaml = intents[intent_id]
             slots_yaml = intent_yaml.get('slots', [])
+            handler_name = intent_yaml.get('on_complete')
             slot_objs = []
             for slot in slots_yaml:
                 _id = slot['id']
@@ -55,7 +56,7 @@ class IntentState(object):
                 datatype = slot.get('datatype', 'string')
                 slot_obj = Slot(_id, question, options, datatype)
                 slot_objs.append(slot_obj)
-            intent = Intent(intent_id, slot_objs)
+            intent = Intent(intent_id, handler_name, slot_objs)
             intent_slots.append(intent)
         return intent_slots
 
@@ -116,10 +117,12 @@ class IntentState(object):
         next_message, options = self._next_slot_message(data)
         completed = next_message is None
         intent_id = data[self.intent_id_field]
+        intent = self.intent_id_to_intent_definition[intent_id]
         result = IntentResult(intent_id,
                               completed,
                               dict(data[self.intent_answers_field].items()),
                               next_message,
+                              intent.on_complete,
                               options)
         return result
 

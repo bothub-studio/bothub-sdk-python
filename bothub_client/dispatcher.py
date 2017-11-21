@@ -93,8 +93,16 @@ class DefaultDispatcher(object):
         command, args = self._get_command_args(content)
         logger.debug('dispatch: start command %s', command)
         try:
-            handler_func = getattr(self.bot, self.command_handlers[command])
-            handler_func(event, context, *args)
+            new_style_handler_name = self.command_handlers.get(command)
+            old_style_handler_name = self.command_handler_pattern.format(command=command)
+
+            if new_style_handler_name:
+                handler_func = getattr(self.bot, new_style_handler_name)
+                handler_func(event, context, args)
+            elif old_style_handler_name:
+                handler_func = getattr(self.bot, old_style_handler_name)
+                handler_func(event, context, *args)
+
         except KeyError:
             self.bot.send_message('No such command: {}'.format(command))
 
@@ -103,8 +111,16 @@ class DefaultDispatcher(object):
         result = self.state.next(event)
         if result.completed:
             logger.debug('dispatch: intent completed')
-            handler_func = getattr(self.bot, self.intent_handlers[result.intent_id])
-            handler_func(event, context, result.answers)
+
+            new_sytle_handler_name = self.intent_handlers.get(result.intent_id)
+            old_style_handler_name = result.complete_handler_name
+
+            if new_sytle_handler_name:
+                handler_func = getattr(self.bot, new_sytle_handler_name)
+                handler_func(event, context, result.answers)
+            elif old_style_handler_name:
+                handler_func = getattr(self.bot, old_style_handler_name)
+                handler_func(**result.answers)
         else:
             message = Message(event)
             message.set_text(result.next_message)

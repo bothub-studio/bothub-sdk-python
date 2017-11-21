@@ -39,20 +39,20 @@ class MockBot(object):
         self.executed.append(Executed('set_credentials', (answers['app_id'], answers['app_secret'])))
 
     @command('hello')
-    def hello(self, event, context):
+    def hello(self, event, context, args):
         self.executed.append(Executed('hello', [event, context]))
 
 
 def fixture_intent_slots():
     return [
-        Intent('credentials', [
-            Slot('app_id', 'Please tell me your app ID', 'string'),
-            Slot('app_secret', 'Please tell me your app secret', 'string'),
+        Intent('credentials', None, [
+            Slot('app_id', None, 'Please tell me your app ID', 'string'),
+            Slot('app_secret', None, 'Please tell me your app secret', 'string'),
         ]),
-        Intent('address', [
-            Slot('country', 'Please tell me your country', 'string'),
-            Slot('city', 'Please tell me your city', 'string'),
-            Slot('road', 'Please tell me your road address', 'string'),
+        Intent('address', None, [
+            Slot('country', None, 'Please tell me your country', 'string'),
+            Slot('city', None, 'Please tell me your city', 'string'),
+            Slot('road', None, 'Please tell me your road address', 'string'),
         ])
     ]
 

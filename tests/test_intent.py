@@ -44,14 +44,14 @@ class MockBot(object):
 
 def fixture_intent_slots():
     return [
-        Intent('credentials', [
-            Slot('app_id', 'Please tell me your app ID', 'string'),
-            Slot('app_secret', 'Please tell me your app secret', 'string'),
+        Intent('credentials', None, [
+            Slot('app_id', 'Please tell me your app ID', None, 'string'),
+            Slot('app_secret', 'Please tell me your app secret', None, 'string'),
         ]),
-        Intent('address', [
-            Slot('country', 'Please tell me your country', 'string'),
-            Slot('city', 'Please tell me your city', 'string'),
-            Slot('road', 'Please tell me your road address', 'string'),
+        Intent('address', None, [
+            Slot('country', 'Please tell me your country', None, 'string'),
+            Slot('city', 'Please tell me your city', None, 'string'),
+            Slot('road', 'Please tell me your road address', None, 'string'),
         ])
     ]
 
@@ -63,8 +63,8 @@ def test_init_intent_should_set_init_entries():
     state.open('credentials')
     assert bot.data['_intent_id'] == 'credentials'
     assert bot.data['_remaining_slots'] == [
-        {'id': 'app_id', 'question': 'Please tell me your app ID', 'datatype': 'string'},
-        {'id': 'app_secret', 'question': 'Please tell me your app secret', 'datatype': 'string'},
+        {'id': 'app_id', 'question': 'Please tell me your app ID', 'datatype': 'string', 'options': None},
+        {'id': 'app_secret', 'question': 'Please tell me your app secret', 'datatype': 'string', 'options': None},
     ]
 
 
@@ -74,15 +74,15 @@ def test_get_result_should_return_result_with_next_message():
     state = IntentState(bot, intent_slots)
     state.open('credentials')
     assert bot.data['_remaining_slots'] == [
-        {'id': 'app_id', 'question': 'Please tell me your app ID', 'datatype': 'string'},
-        {'id': 'app_secret', 'question': 'Please tell me your app secret', 'datatype': 'string'},
+        {'id': 'app_id', 'question': 'Please tell me your app ID', 'datatype': 'string', 'options': None},
+        {'id': 'app_secret', 'question': 'Please tell me your app secret', 'datatype': 'string', 'options': None},
     ]
 
     result = state.next()
     assert result.completed is False
     assert result.next_message == 'Please tell me your app ID'
     assert bot.data['_remaining_slots'] == [
-        {'id': 'app_secret', 'question': 'Please tell me your app secret', 'datatype': 'string'},
+        {'id': 'app_secret', 'question': 'Please tell me your app secret', 'datatype': 'string', 'options': None},
     ]
 
     result = state.next({'content': '<my app ID>'})
@@ -164,5 +164,5 @@ def test_dispatch_should_trigger_intent_and_default():
 
 def test_intent_state_load_intent_slots_should_return_intent_slots():
     intent_slots = IntentState.load_intent_slots_from_yml('tests/fixtures/test_bothub.yml')
-    assert intent_slots == [Intent('age', [Slot('age', 'How old are you?', 'string'),
-                                           Slot('name', 'What is your name?', 'string')])]
+    assert intent_slots == [Intent('age', None, [Slot('age', 'How old are you?', [], 'string'),
+                                                 Slot('name', 'What is your name?', [], 'string')])]
