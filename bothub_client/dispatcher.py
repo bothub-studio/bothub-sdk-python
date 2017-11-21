@@ -67,15 +67,16 @@ class DefaultDispatcher(object):
         if current_channel is None:
             return
 
-        channel_handler = self.channel_handlers.get('default', None) \
-                          if current_channel not in self.channel_handlers else \
-                          self.channel_handlers[current_channel]
-
-        if not channel_handler:
-            return
-
-        handler_func = getattr(self.bot, channel_handler)
-        handler_func(event, context)
+        channel_handler = self.channel_handlers.get(current_channel)
+        if channel_handler is None:
+            channel_handler = self.channel_handlers.get('default', None)
+        if channel_handler:
+            handler_func = getattr(self.bot, channel_handler)
+            handler_func(event, context)
+        else:
+            handler_func = getattr(self.bot, self.default_handler_name, None)
+            if handler_func:
+                handler_func(event, context)
 
     def open_intent(self, event, content):
         intent_id = self._get_intent_id(content)
@@ -113,7 +114,7 @@ class DefaultDispatcher(object):
             logger.debug('dispatch: intent completed')
 
             new_sytle_handler_name = self.intent_handlers.get(result.intent_id)
-            old_style_handler_name = result.complete_handler_name
+            old_style_handler_name = result.complete_handler_name or 'set_{}'.format(result.intent_id)
 
             if new_sytle_handler_name:
                 handler_func = getattr(self.bot, new_sytle_handler_name)
