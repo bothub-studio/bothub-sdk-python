@@ -1,3 +1,10 @@
+0.1.25
+------
+
+* change: add new style class declaration
+* change: add options to intent
+* fix: Zmq socket issue
+
 0.1.24
 ------
 
