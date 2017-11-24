@@ -121,7 +121,7 @@ class DefaultDispatcher(object):
                 handler_func(event, context, result.answers)
             elif old_style_handler_name:
                 handler_func = getattr(self.bot, old_style_handler_name)
-                handler_func(**result.answers)
+                handler_func(event, context, **result.answers)
         else:
             message = Message(event)
             message.set_text(result.next_message)
