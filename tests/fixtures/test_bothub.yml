@@ -1,0 +1,7 @@
+intents:
+  age:
+    slots:
+      - id: age
+        question: How old are you?
+      - id: name
+        question: What is your name?

@@ -44,6 +44,8 @@ def handle_message(event, context, bot_class):
     bot = bot_class(channel_client=channel, storage_client=storage,
                     nlu_client_factory=nlu_client_factory, event=event)
     response = bot.handle_message(event, context)
+    bot.close()
+    channel.close()
     return {'response': response}
 
 
@@ -114,22 +116,29 @@ class ChannelClient(BaseChannelClient):
         data = self._prepare_payload(chat_id, message, channel, event, extra)
         self.transport.post('/messages', data)
 
+    def close(self):
+        pass
+
 
 class ZmqChannelClient(BaseChannelClient):
     '''A ChannelClient class using ZeroMQ
 
     Send a message to  a messenger platform'''
     @staticmethod
-    def init_client(context):
+    def init_client(context, transport=None):
         project_id = context.get('project_id')
         api_key = context.get('api_key', '')
         channel_endpoint = context.get('channel', {}).get('endpoint')
+        _transport = transport or ZmqTransport(channel_endpoint)
         return ZmqChannelClient(project_id, api_key, channel_endpoint,
-                                transport=ZmqTransport(channel_endpoint), context=context)
+                                transport=_transport, context=context)
 
     def send_message(self, chat_id, message, channel=None, event=None, extra=None):
         data = self._prepare_payload(chat_id, message, channel, event, extra)
         self.transport.send_multipart([json.dumps(data).encode('utf8')])
+
+    def close(self):
+        self.transport.close()
 
 
 class StorageClient(Client):
@@ -142,7 +151,7 @@ class StorageClient(Client):
         project_id = context.get('project_id')
         api_key = context.get('api_key', '')
         storage_endpoint = context.get('storage', {}).get('endpoint')
-        user = None if not event else (event['channel'], event['sender']['id'])
+        user = None if not event else (event['channel'], event.get('sender', {}).get('id'))
         return StorageClient(project_id, api_key, storage_endpoint, transport=transport, user=user)
 
     def set_project_data(self, data):

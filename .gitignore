@@ -9,3 +9,4 @@ dist/
 *.pyc
 /*.html
 .mypy_cache/
+htmlcov/
