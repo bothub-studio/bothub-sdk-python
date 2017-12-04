@@ -160,10 +160,11 @@ class StorageClient(Client):
             {'data': data},
         )
 
-    def get_project_data(self):
-        return self.transport.get(
-            '/projects/{}'.format(self.project_id),
-        ).get('data') or {}
+    def get_project_data(self, key=None):
+        url = '/projects/{}'.format(self.project_id)
+        if key:
+            url += '?key={}'.format(key)
+        return self.transport.get(url).get('data') or {}
 
     def set_user_data(self, channel, user_id, data):
         self.transport.put(
@@ -171,18 +172,19 @@ class StorageClient(Client):
             {'data': data},
         )
 
-    def get_user_data(self, channel, user_id):
-        return self.transport.get(
-            '/projects/{}/channels/{}/users/{}'.format(self.project_id, channel, user_id)
-        ).get('data') or {}
+    def get_user_data(self, channel, user_id, key=None):
+        url = '/projects/{}/channels/{}/users/{}'.format(self.project_id, channel, user_id)
+        if key:
+            url += '?key={}'.format(key)
+        return self.transport.get(url).get('data') or {}
 
     def set_current_user_data(self, data):
         channel, user_id = self.current_user
         self.set_user_data(channel, user_id, data)
 
-    def get_current_user_data(self):
+    def get_current_user_data(self, key=None):
         channel, user_id = self.current_user
-        return self.get_user_data(channel, user_id)
+        return self.get_user_data(channel, user_id, key)
 
 
 class NluClient(object):
