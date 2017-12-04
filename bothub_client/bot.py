@@ -74,12 +74,12 @@ class BaseBot(object):
         :return: None'''
         self.storage_client.set_project_data(data)
 
-    def get_project_data(self):
+    def get_project_data(self, key=None):
         '''Returns project properties
 
         :return: a properties dict
         :rtype: dict'''
-        return self.storage_client.get_project_data()
+        return self.storage_client.get_project_data(key)
 
     def set_user_data(self, data, user_id=None, channel=None, event=None):
         '''Set user properties
@@ -94,7 +94,7 @@ class BaseBot(object):
         _user_id, _channel = self._get_channel_user(user_id, channel, event)
         self.storage_client.set_user_data(_channel, _user_id, data)
 
-    def get_user_data(self, user_id=None, channel=None, event=None):
+    def get_user_data(self, user_id=None, channel=None, event=None, key=None):
         '''Returns user properties
 
         :param user_id: an user id to store data
@@ -104,7 +104,7 @@ class BaseBot(object):
         :return: a properties dict
         :rtype: dict'''
         _user_id, _channel = self._get_channel_user(user_id, channel, event)
-        return self.storage_client.get_user_data(_channel, user_id=_user_id)
+        return self.storage_client.get_user_data(_channel, user_id=_user_id, key=key)
 
     def nlu(self, vendor):
         '''Returns NLU client
