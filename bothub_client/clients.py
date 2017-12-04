@@ -163,7 +163,7 @@ class StorageClient(Client):
     def get_project_data(self, key=None):
         url = '/projects/{}'.format(self.project_id)
         if key:
-            url += '?key={}'.format(key)
+            url += '/{}'.format(key)
         return self.transport.get(url).get('data') or {}
 
     def set_user_data(self, channel, user_id, data):
@@ -175,7 +175,7 @@ class StorageClient(Client):
     def get_user_data(self, channel, user_id, key=None):
         url = '/projects/{}/channels/{}/users/{}'.format(self.project_id, channel, user_id)
         if key:
-            url += '?key={}'.format(key)
+            url += '/{}'.format(key)
         return self.transport.get(url).get('data') or {}
 
     def set_current_user_data(self, data):
