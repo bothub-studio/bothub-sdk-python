@@ -225,26 +225,29 @@ class ApiAiNluClient(NluClient):
         next_message = json_response.get('result').get('fulfillment', {}).get('speech')
         return NluResponse(json_response, next_message, action)
 
-    def ask(self, event=None, message=None, session_id=None):
+    def ask(self, lang='en', event=None, message=None, session_id=None):
         '''Query a message to API.ai
 
-        use ``ask(event=event)`` form either ``ask(message='a text', session_id=<session_id>)``
+        use ``ask(lang='de', event=event)``
+        form either ``ask(lang='de', message='a text', session_id=<session_id>)``
 
         :param event: an event dict messenger platform sent. '''
         if event:
-            return self._ask_with_event(event)
+            return self._ask_with_event(lang, event)
         if message and session_id:
-            return self._ask_with_message(message, session_id)
+            return self._ask_with_message(lang, message, session_id)
 
-    def _ask_with_event(self, event):
+    def _ask_with_event(self, lang, event):
         request = self.apiai.text_request()
+        request.lang = lang
         request.query = event.get('content')
         request.session_id = '{}-{}'.format(event.get('channel'), event.get('sender').get('id'))
         response = request.getresponse()
         return ApiAiNluClient.parse_response(response)
 
-    def _ask_with_message(self, message, session_id):
+    def _ask_with_message(self, lang, message, session_id):
         request = self.apiai.text_request()
+        request.lang = lang
         request.query = message
         request.session_id = session_id
         response = request.getresponse()
