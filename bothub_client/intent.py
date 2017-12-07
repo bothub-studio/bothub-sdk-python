@@ -136,7 +136,7 @@ class IntentState(object):
 
     def _store_answer(self, event, data):
         slot_id = data[self.slot_id_field]
-        data.setdefault(self.intent_answers_field, {})[str(slot_id)] = event['content']
+        data.setdefault(self.intent_answers_field, {})[slot_id] = event['content']
 
     def _has_remainig_slots(self, data):
         return self.remaining_slots_field in data and data[self.remaining_slots_field] is not None

@@ -160,10 +160,11 @@ class StorageClient(Client):
             {'data': data},
         )
 
-    def get_project_data(self):
-        return self.transport.get(
-            '/projects/{}'.format(self.project_id),
-        ).get('data') or {}
+    def get_project_data(self, key=None):
+        url = '/projects/{}'.format(self.project_id)
+        if key:
+            url += '/{}'.format(key)
+        return self.transport.get(url).get('data') or {}
 
     def set_user_data(self, channel, user_id, data):
         self.transport.put(
@@ -171,18 +172,19 @@ class StorageClient(Client):
             {'data': data},
         )
 
-    def get_user_data(self, channel, user_id):
-        return self.transport.get(
-            '/projects/{}/channels/{}/users/{}'.format(self.project_id, channel, user_id)
-        ).get('data') or {}
+    def get_user_data(self, channel, user_id, key=None):
+        url = '/projects/{}/channels/{}/users/{}'.format(self.project_id, channel, user_id)
+        if key:
+            url += '/{}'.format(key)
+        return self.transport.get(url).get('data') or {}
 
     def set_current_user_data(self, data):
         channel, user_id = self.current_user
         self.set_user_data(channel, user_id, data)
 
-    def get_current_user_data(self):
+    def get_current_user_data(self, key=None):
         channel, user_id = self.current_user
-        return self.get_user_data(channel, user_id)
+        return self.get_user_data(channel, user_id, key)
 
 
 class NluClient(object):
@@ -223,26 +225,30 @@ class ApiAiNluClient(NluClient):
         next_message = json_response.get('result').get('fulfillment', {}).get('speech')
         return NluResponse(json_response, next_message, action)
 
-    def ask(self, event=None, message=None, session_id=None):
+    def ask(self, event=None, message=None, session_id=None, lang='en'):
         '''Query a message to API.ai
 
-        use ``ask(event=event)`` form either ``ask(message='a text', session_id=<session_id>)``
+        use ``ask(event=event)``
+        form either ``ask(message='a text', session_id=<session_id>)``
 
-        :param event: an event dict messenger platform sent. '''
+        :param event: an event dict messenger platform sent.
+        :param lang: optional, default value equal 'en' '''
         if event:
-            return self._ask_with_event(event)
+            return self._ask_with_event(event, lang)
         if message and session_id:
-            return self._ask_with_message(message, session_id)
+            return self._ask_with_message(message, session_id, lang)
 
-    def _ask_with_event(self, event):
+    def _ask_with_event(self, event, lang):
         request = self.apiai.text_request()
+        request.lang = lang
         request.query = event.get('content')
         request.session_id = '{}-{}'.format(event.get('channel'), event.get('sender').get('id'))
         response = request.getresponse()
         return ApiAiNluClient.parse_response(response)
 
-    def _ask_with_message(self, message, session_id):
+    def _ask_with_message(self, message, session_id, lang):
         request = self.apiai.text_request()
+        request.lang = lang
         request.query = message
         request.session_id = session_id
         response = request.getresponse()
