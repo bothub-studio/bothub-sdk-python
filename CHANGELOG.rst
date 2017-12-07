@@ -1,3 +1,9 @@
+0.1.26
+------
+
+* add language parameter to ApiAi.ask()
+* add a `key` argument to `get_user_data()` and `get_project_data()`
+
 0.1.25
 ------
 
