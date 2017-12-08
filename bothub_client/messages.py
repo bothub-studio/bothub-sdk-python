@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+MARKUP_MARKDOWN = 'markdown'
+MARKUP_HTML = 'html'
+
 
 class Message(object):
     '''A message class which renders rich messages like button, quick replies
@@ -14,15 +17,18 @@ class Message(object):
         self.model = []
         self.event = event
 
-    def set_text(self, text):
+    def set_text(self, text, markup=None):
         '''Set text message
 
         :param text: a text to send
-        :type text: str'''
+        :type text: str
+        :param markup: a markup
+        :type markup: str'''
         self.model.append({
             'command': 'set_text',
             'args': {
-                'text': text
+                'text': text,
+                'markup': markup,
             }
         })
         return self
