@@ -4,6 +4,16 @@ MARKUP_MARKDOWN = 'markdown'
 MARKUP_HTML = 'html'
 
 
+class Markdown(object):
+    def __init__(self, text):
+        self.text = text
+
+
+class HTML(object):
+    def __init__(self, text):
+        self.text = text
+
+
 class Message(object):
     '''A message class which renders rich messages like button, quick replies
 
@@ -17,18 +27,29 @@ class Message(object):
         self.model = []
         self.event = event
 
-    def set_text(self, text, markup=None):
+    def set_text(self, text):
         '''Set text message
 
         :param text: a text to send
         :type text: str
         :param markup: a markup
         :type markup: str'''
+
+        if isinstance(text, Markdown):
+            _text = text.text
+            _markup = MARKUP_MARKDOWN
+        elif isinstance(text, HTML):
+            _text = text.text
+            _markup = MARKUP_HTML
+        else:
+            _text = text
+            _markup = None
+
         self.model.append({
             'command': 'set_text',
             'args': {
-                'text': text,
-                'markup': markup,
+                'text': _text,
+                'markup': _markup,
             }
         })
         return self
