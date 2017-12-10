@@ -1,3 +1,8 @@
+0.1.27
+------
+
+* support markdown text in `set_text()`
+
 0.1.26
 ------
 

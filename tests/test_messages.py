@@ -1,12 +1,26 @@
 # -*- coding: utf-8 -*-
 
 from bothub_client.messages import Message
+from bothub_client.messages import Markdown
+from bothub_client.messages import HTML
 
 
 def test_set_text_should_append_entry():
     message = Message(None).set_text('hello')
     assert message.model == [{'command': 'set_text',
-                              'args': {'text': 'hello'}}]
+                              'args': {'text': 'hello', 'markup': None}}]
+
+
+def test_set_text_with_markdown_should_append_entry():
+    message = Message(None).set_text(Markdown('hello'))
+    assert message.model == [{'command': 'set_text',
+                              'args': {'text': 'hello', 'markup': 'markdown'}}]
+
+
+def test_set_text_with_markdown_should_append_entry():
+    message = Message(None).set_text(HTML('hello'))
+    assert message.model == [{'command': 'set_text',
+                              'args': {'text': 'hello', 'markup': 'html'}}]
 
 
 def test_add_url_button_should_append_entry():

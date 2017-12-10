@@ -19,17 +19,17 @@ class DummyStorageClient(object):
     def set_project_data(self, data):
         self.executed.append(('set_project_data', {'data': data}))
 
-    def get_project_data(self):
-        self.executed.append(('get_project_data', {}))
+    def get_project_data(self, key=None):
+        self.executed.append(('get_project_data', {'key': key}))
         return {}
 
     def set_user_data(self, channel, user_id, data):
         self.executed.append(('set_user_data',
                               {'data': data, 'channel': channel, 'user_id': user_id}))
 
-    def get_user_data(self, channel, user_id):
+    def get_user_data(self, channel, user_id, key=None):
         self.executed.append(('get_user_data',
-                              {'channel': channel, 'user_id': user_id}))
+                              {'channel': channel, 'user_id': user_id, 'key': key}))
         return {}
 
 
@@ -60,7 +60,7 @@ def test_get_project_data_should_invoke_client():
     storage_client = DummyStorageClient()
     bot = BaseBot(storage_client=storage_client, event={})
     bot.get_project_data()
-    assert storage_client.executed.pop(0) == ('get_project_data', {})
+    assert storage_client.executed.pop(0) == ('get_project_data', {'key': None})
 
 
 def test_set_user_data_should_invoke_client():
@@ -76,7 +76,7 @@ def test_get_user_data_should_invoke_client():
     bot = BaseBot(storage_client=storage_client, event={})
     bot.get_user_data()
     assert storage_client.executed.pop(0) == ('get_user_data',
-                                              {'user_id': None, 'channel': None})
+                                              {'user_id': None, 'channel': None, 'key': None})
 
 
 def test_nlu_should_return_client():
