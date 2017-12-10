@@ -238,7 +238,7 @@ class ApiAiNluClient(NluClient):
         if message and session_id:
             return self._ask_with_message(message, session_id, lang)
 
-    def _ask_with_event(self, event, lang):
+    def _ask_with_event(self, event, lang='en'):
         request = self.apiai.text_request()
         request.lang = lang
         request.query = event.get('content')
@@ -246,7 +246,7 @@ class ApiAiNluClient(NluClient):
         response = request.getresponse()
         return ApiAiNluClient.parse_response(response)
 
-    def _ask_with_message(self, message, session_id, lang):
+    def _ask_with_message(self, message, session_id, lang='en'):
         request = self.apiai.text_request()
         request.lang = lang
         request.query = message
