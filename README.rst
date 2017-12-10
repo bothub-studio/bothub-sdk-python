@@ -102,21 +102,22 @@ You can send a message with rich controls like 'quick replies' or 'buttons' usin
 Storage
 -------
 
-To store/retreive some property data, we provides following methods:
+To store/retreive a property data, we provides following methods:
 
 * Project level
 
   * ``self.set_project_data(data)``: set data to a project
-  * ``self.get_project_data()``: get data from a project
+  * ``self.get_project_data(key=None)``: get data from a project
 
 * User level
 
   * ``self.set_user_data(data, user_id=None, channel=None)``: set user data
-  * ``self.get_user_data(user_id=None, channel=None)``: get user data
+  * ``self.get_user_data(user_id=None, channel=None, key=None)``: get user data
 
 ``data`` should be a dict. An existing properties not included in ``data`` will be ignored, not be deleted.
 
-If ``user_id`` and ``channel`` is ``None``, it regarded as a message sender.
+* If ``user_id`` and ``channel`` is ``None``, it regarded as a message sender.
+* When ``key`` is ``None``, get whole dictionary will be returned. Otherwise, subtree of given key will be returned.
 
 
 NLU Integeration
@@ -141,6 +142,8 @@ Or, put explicit message and session_id by yourself.
           def handle_message(self, event, context):
               response = self.nlu('apiai').ask(message='hello', session_id='customer1')
               self.send_message(response.next_message)
+
+If you want to use a language other than english, use ``lang`` keyword argument on ``ask()`` function.
 
 ``ask`` method returns a ``NluResponse`` object which contains attributes like:
 
