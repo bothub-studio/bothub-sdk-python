@@ -81,6 +81,14 @@ class BaseBot(object):
         :rtype: dict'''
         return self.storage_client.get_project_data(key)
 
+    def load_project_data(self):
+        '''Set project properties
+        :return: None'''
+        self.storage_client.load_project_data()
+
+    def update_project_data(self):
+        return self.storage_client.update_project_data()
+
     def set_user_data(self, data, user_id=None, channel=None, event=None):
         '''Set user properties
 
