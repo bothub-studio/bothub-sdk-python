@@ -37,7 +37,10 @@ class MockOldStyleBot(object):
         self.executed.append(Executed('set_credentials', (answers['app_id'], answers['app_secret'])))
 
     def on_hello(self, event, context, *args):
-        self.executed.append(Executed('hello', [event, context]))
+        self.executed.append(Executed('hello', (event, context) + args))
+
+    def on_no_args(self, event, context):
+        self.executed.append(Executed('no_args', (event, context)))
 
 
 class MockNewStyleBot(object):
@@ -67,7 +70,7 @@ class MockNewStyleBot(object):
 
     @command('hello')
     def hello(self, event, context, args):
-        self.executed.append(Executed('hello', [event, context]))
+        self.executed.append(Executed('hello', (event, context)))
 
 
 def fixture_intent_slots():
@@ -109,7 +112,7 @@ def test_simple_message_dispatch_should_call_execute_command():
 
     executed = bot.executed.pop(0) # type: Executed
     assert executed.command == 'hello'
-    assert executed.args == [event, None]
+    assert executed.args == (event, None)
 
 
 def test_simple_message_dispatch_should_call_intent_complete_handler():
@@ -156,4 +159,32 @@ def test_simple_message_old_style_dispatch_should_call_execute_command():
 
     executed = bot.executed.pop(0) # type: Executed
     assert executed.command == 'hello'
-    assert executed.args == [event, None]
+    assert executed.args == (event, None)
+
+
+def test_simple_message_old_style_dispatch_should_call_execute_command_without_args():
+    bot = MockOldStyleBot()
+    intent_slots = fixture_intent_slots()
+    state = IntentState(bot, intent_slots)
+    dispatcher = DefaultDispatcher(bot, state)
+
+    event = {'content': '/no_args', 'channel': 'fakechannel'}
+    dispatcher.dispatch(event, None)
+
+    executed = bot.executed.pop(0) # type: Executed
+    assert executed.command == 'no_args'
+    assert executed.args == (event, None)
+
+
+def test_simple_message_old_style_dispatch_should_call_execute_command_with_args():
+    bot = MockOldStyleBot()
+    intent_slots = fixture_intent_slots()
+    state = IntentState(bot, intent_slots)
+    dispatcher = DefaultDispatcher(bot, state)
+
+    event = {'content': '/hello arg1', 'channel': 'fakechannel'}
+    dispatcher.dispatch(event, None)
+
+    executed = bot.executed.pop(0) # type: Executed
+    assert executed.command == 'hello'
+    assert executed.args == (event, None, 'arg1')

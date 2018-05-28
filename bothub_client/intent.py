@@ -32,7 +32,7 @@ class IntentState(object):
 
     @staticmethod
     def load_yml(path):
-        with open(path) as fin:
+        with open(path, encoding='utf8') as fin:
             content = fin.read()
         return yaml.load(content)
 
