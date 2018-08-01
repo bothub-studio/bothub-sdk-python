@@ -104,8 +104,13 @@ class DefaultDispatcher(object):
                 handler_func = getattr(self.bot, old_style_handler_name)
                 handler_func(event, context, *args)
 
-        except KeyError:
-            self.bot.send_message('No such command: {}'.format(command))
+        except (KeyError, AttributeError):
+            if self._is_kakao_init_keyboard_command(content):
+                message = Message(event)
+                message.add_keyboard_button('init_keyboard')
+                self.bot.send_message(message)
+            else:
+                self.bot.send_message('No such command: {}'.format(command))
 
     def proceed_intent(self, event, context):
         logger.debug('dispatch: continue to process intent')
@@ -135,6 +140,9 @@ class DefaultDispatcher(object):
 
     def _is_intent_command(self, content):
         return content is not None and content.startswith('/intent ')
+
+    def _is_kakao_init_keyboard_command(self, content):
+        return content is not None and content == '/kakao_init_keyboard'
 
     def _get_intent_id(self, content):
         _, intent_id = content.split()
