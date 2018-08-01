@@ -34,7 +34,7 @@ class IntentState(object):
     def load_yml(path):
         with open(path, encoding='utf8') as fin:
             content = fin.read()
-        return yaml.load(content)
+        return yaml.safe_load(content)
 
     @staticmethod
     def load_intent_slots_from_yml(path):
