@@ -49,7 +49,7 @@ class DefaultDispatcher(object):
         '''
         logger.debug('dispatch: started')
 
-        content = event.get('content')
+        content = event.get('payload') or event.get('content')
 
         if self._is_intent_command(content):
             self.open_intent(event, content)
