@@ -1,3 +1,10 @@
+0.1.29
+------
+
+* change: yml load to safe_load
+* add: Slack and Kakao channel
+* fix: using 'content' if 'payload' is empty
+
 0.1.28
 ------
 

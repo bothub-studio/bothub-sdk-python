@@ -107,7 +107,7 @@ class DefaultDispatcher(object):
         except (KeyError, AttributeError):
             if self._is_kakao_init_keyboard_command(content):
                 message = Message(event)
-                message.add_keyboard_button('init_keyboard')
+                message.add_keyboard_button('__init_keyboard__')
                 self.bot.send_message(message)
             else:
                 self.bot.send_message('No such command: {}'.format(command))
