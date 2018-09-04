@@ -54,6 +54,25 @@ class Message(object):
         })
         return self
 
+    def add_image(self, url, width, height):
+        '''Add image
+
+        :param url: image url
+        :type url: str
+        :param width: image's width
+        :type width: str
+        :param height: image's height
+        :type height: str'''
+        self.model.append({
+            'command': 'add_image',
+            'args': {
+                'url': url,
+                'width': width,
+                'height': height
+            }
+        })
+        return self
+
     def add_url_button(self, text, url):
         '''Add an URL button
 

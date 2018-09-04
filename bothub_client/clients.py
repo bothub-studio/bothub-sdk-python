@@ -85,7 +85,9 @@ class BaseChannelClient(Client):
             'event': event,
             'context': {
                 'project_id': self.project_id,
-                'api_key': self.api_key
+                'api_key': self.api_key,
+                'request_id': self.context.get('request_id'),
+                'rabbitmq': self.context.get('rabbitmq', {}).get('endpoint', 'localhost')
             },
             'extra': extra
         }
