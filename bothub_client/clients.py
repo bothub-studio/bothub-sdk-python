@@ -72,7 +72,7 @@ class BaseChannelClient(Client):
             if channel['type'] == channel_type:
                 return channel
 
-    def _prepare_payload(self, chat_id, message, channel=None, event=None, extra=None):
+    def _default_prepare_payload(self, chat_id, channel, event):
         from_chat_id = event.get('chat_id')
         origin_channel = event.get('channel')
         _chat_id = chat_id or from_chat_id
@@ -88,9 +88,13 @@ class BaseChannelClient(Client):
                 'api_key': self.api_key,
                 'request_id': self.context.get('request_id'),
                 'rabbitmq': self.context.get('rabbitmq', {}).get('endpoint', 'localhost')
-            },
-            'extra': extra
+            }
         }
+        return data
+
+    def _prepare_payload(self, chat_id, message, channel=None, event=None, extra=None):
+        data = self._default_prepare_payload(chat_id, channel, event)
+        data['extra'] = extra
 
         if isinstance(message, Message):
             data['message'] = {
@@ -99,6 +103,11 @@ class BaseChannelClient(Client):
             }
         else:
             data['message'] = message
+        return data
+
+    def _prepare_payload_to_photo(self, chat_id, photo_url, channel=None, event=None):
+        data = self._default_prepare_payload(chat_id, channel, event)
+        data['photo'] = photo_url
         return data
 
 
@@ -117,6 +126,9 @@ class ChannelClient(BaseChannelClient):
     def send_message(self, chat_id, message, channel=None, event=None, extra=None):
         data = self._prepare_payload(chat_id, message, channel, event, extra)
         self.transport.post('/messages', data)
+
+    def send_photo(self, chat_id, photo_url, channel=None, event=None):
+        pass
 
     def close(self):
         pass
@@ -137,6 +149,10 @@ class ZmqChannelClient(BaseChannelClient):
 
     def send_message(self, chat_id, message, channel=None, event=None, extra=None):
         data = self._prepare_payload(chat_id, message, channel, event, extra)
+        self.transport.send_multipart([json.dumps(data).encode('utf8')])
+
+    def send_photo(self, chat_id, photo_url, channel=None, event=None):
+        data = self._prepare_payload_to_photo(chat_id, photo_url, channel, event)
         self.transport.send_multipart([json.dumps(data).encode('utf8')])
 
     def close(self):
