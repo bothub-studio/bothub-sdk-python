@@ -151,7 +151,7 @@ class Message(object):
         return self
 
     def add_template(self, payload):
-        '''Set template payload
+        '''Add a template payload
 
         :param payload: template payload. Only Facebook Messenger supported.
         :type payload: dict'''
