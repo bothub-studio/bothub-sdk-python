@@ -150,6 +150,19 @@ class Message(object):
         })
         return self
 
+    def add_template(self, payload):
+        '''Set template payload
+
+        :param payload: template payload. Only Facebook Messenger supported.
+        :type payload: dict'''
+        self.model.append({
+            'command': 'add_template',
+            'args': {
+                'payload': payload
+            }
+        })
+        return self
+
     def __repr__(self):
         result = []
         for model_entry in self.model:

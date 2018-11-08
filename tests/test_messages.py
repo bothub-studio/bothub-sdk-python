@@ -55,3 +55,9 @@ def test_add_keyboard_button_should_append_entry():
     message = Message(None).add_keyboard_button('hello')
     assert message.model == [{'command': 'add_keyboard_button',
                               'args': {'text': 'hello'}}]
+
+
+def test_add_template_should_append_entry():
+    message = Message(None).add_template('mypayload')
+    assert message.model == [{'command': 'add_template',
+                              'args': {'payload': 'mypayload'}}]
