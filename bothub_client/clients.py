@@ -240,7 +240,7 @@ class DialogflowNluClient(NluClient):
         :return: an NluResponse object
         :rtype: bothub_client.clients.NluResponse'''
         action = NluAction(
-            query_result.intent,
+            query_result.action or query_result.intent.display_name,
             query_result.parameters,
             not query_result.all_required_params_present
         )

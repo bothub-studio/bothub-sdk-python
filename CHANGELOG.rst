@@ -1,3 +1,10 @@
+0.1.30
+------
+
+* add: support Dialogflow for NLUClient
+* add: add_template() for Facebook
+* add: send_photo() for Telegram, Facebook
+
 0.1.29
 ------
 
