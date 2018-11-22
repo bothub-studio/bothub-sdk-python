@@ -72,7 +72,7 @@ class BaseChannelClient(Client):
             if channel['type'] == channel_type:
                 return channel
 
-    def _prepare_payload(self, chat_id, message, channel=None, event=None, extra=None):
+    def _default_prepare_payload(self, chat_id, channel, event):
         from_chat_id = event.get('chat_id')
         origin_channel = event.get('channel')
         _chat_id = chat_id or from_chat_id
@@ -88,9 +88,13 @@ class BaseChannelClient(Client):
                 'api_key': self.api_key,
                 'request_id': self.context.get('request_id'),
                 'rabbitmq': self.context.get('rabbitmq', {}).get('endpoint', 'localhost')
-            },
-            'extra': extra
+            }
         }
+        return data
+
+    def _prepare_payload(self, chat_id, message, channel=None, event=None, extra=None):
+        data = self._default_prepare_payload(chat_id, channel, event)
+        data['extra'] = extra
 
         if isinstance(message, Message):
             data['message'] = {
@@ -99,6 +103,11 @@ class BaseChannelClient(Client):
             }
         else:
             data['message'] = message
+        return data
+
+    def _prepare_payload_to_photo(self, chat_id, photo_url, channel=None, event=None):
+        data = self._default_prepare_payload(chat_id, channel, event)
+        data['photo'] = photo_url
         return data
 
 
@@ -117,6 +126,9 @@ class ChannelClient(BaseChannelClient):
     def send_message(self, chat_id, message, channel=None, event=None, extra=None):
         data = self._prepare_payload(chat_id, message, channel, event, extra)
         self.transport.post('/messages', data)
+
+    def send_photo(self, chat_id, photo_url, channel=None, event=None):
+        pass
 
     def close(self):
         pass
@@ -137,6 +149,10 @@ class ZmqChannelClient(BaseChannelClient):
 
     def send_message(self, chat_id, message, channel=None, event=None, extra=None):
         data = self._prepare_payload(chat_id, message, channel, event, extra)
+        self.transport.send_multipart([json.dumps(data).encode('utf8')])
+
+    def send_photo(self, chat_id, photo_url, channel=None, event=None):
+        data = self._prepare_payload_to_photo(chat_id, photo_url, channel, event)
         self.transport.send_multipart([json.dumps(data).encode('utf8')])
 
     def close(self):
@@ -201,6 +217,70 @@ class NluClient(object):
         '''
         raise NotImplementedError()
 
+class DialogflowNluClient(NluClient):
+    '''An NLU client for Dialogflow'''
+    def __init__(self, agent_id):
+        self.agent_id = agent_id
+        self.dialogflow = __import__('dialogflow')
+        self.lang = self._get_lang()
+
+    def _get_lang(self):
+        client = self.dialogflow.AgentsClient()
+        parent = client.project_path(self.agent_id)
+        response = client.get_agent(parent)
+        lang = response.default_language_code
+        return lang
+
+    @staticmethod
+    def parse_response(query_result):
+        '''Parse a response API.ai returns
+
+        :param response: a response which apiai client returns
+        :type response: http.client.HTTPResponse
+        :return: an NluResponse object
+        :rtype: bothub_client.clients.NluResponse'''
+        action = NluAction(
+            query_result.action or query_result.intent.display_name,
+            query_result.parameters,
+            not query_result.all_required_params_present
+        )
+        next_message = query_result.fulfillment_text
+        return NluResponse(query_result, next_message, action)
+
+    def ask(self, event=None, message=None, session_id=None, lang=None):
+        '''Query a message to Dialogflow
+
+        use ``ask(event=event)``
+        form either ``ask(message='a text', session_id=<session_id>)``
+
+        :param event: an event dict messenger platform sent.
+        :param lang: optional, default value equal 'en' '''
+        if event:
+            return self._ask_with_event(event, lang)
+        if message:
+            return self._ask_with_message(message, session_id, lang)
+
+    def _ask_with_event(self, event, lang=None):
+        lang = lang or self.lang
+        text = event.get('content')
+        session_id = '{}-{}'.format(event.get('channel'), event.get('sender').get('id'))
+        session_client = self.dialogflow.SessionsClient()
+        session = session_client.session_path(self.agent_id, session_id)
+        text_input = self.dialogflow.types.TextInput(text=text, language_code=lang)
+        query_input = self.dialogflow.types.QueryInput(text=text_input)
+        response = session_client.detect_intent(session, query_input=query_input)
+
+        return DialogflowNluClient.parse_response(response.query_result)
+
+    def _ask_with_message(self, message, session_id, lang=None):
+        lang = lang or self.lang
+        session_client = self.dialogflow.SessionsClient()
+        session = session_client.session_path(self.agent_id, session_id)
+        text_input = self.dialogflow.types.TextInput(text=message, language_code=lang)
+        query_input = self.dialogflow.types.QueryInput(text=text_input)
+        response = session_client.detect_intent(session, query_input=query_input)
+
+        return DialogflowNluClient.parse_response(response.query_result)
 
 class ApiAiNluClient(NluClient):
     '''An NLU client for API.ai'''
@@ -260,7 +340,8 @@ class ApiAiNluClient(NluClient):
 class NluClientFactory(object):
     '''An NluClientFactory which returns NluClient according to vendor name'''
     NAME_TO_CLIENT = {
-        'apiai': ApiAiNluClient
+        'apiai': ApiAiNluClient,
+        'dialogflow': DialogflowNluClient
     }
 
     def __init__(self, context):

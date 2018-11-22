@@ -66,6 +66,19 @@ class BaseBot(object):
             _event = self.event
         self.channel_client.send_message(chat_id, message, channel, event=_event, extra=extra)
 
+    def send_photo(self, photo_url, chat_id=None, channel=None, event=None):
+        '''Send a photo to an user or chatroom.
+
+        :param photo_url: a photo to send.
+        :type photo : str
+        :param chat_id: receiver chat id
+        :type chat_id: str
+        :param channel: receiver channel name
+        :type channel: str
+        :return: None'''
+        _event = self.event
+        self.channel_client.send_photo(chat_id, photo_url, channel, event=_event)
+
     def set_project_data(self, data):
         '''Set project properties
 
